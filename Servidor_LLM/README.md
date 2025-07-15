@@ -8,7 +8,6 @@ Su propósito principal es **asistir a estudiantes, educadores y desarrolladores
 
 A continuación se describen los componentes y bloques más relevantes:
 
----
 
 ## 1️⃣ Dependencias
 
