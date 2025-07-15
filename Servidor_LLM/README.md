@@ -70,3 +70,75 @@ $response = Invoke-RestMethod `
 $response.codigo
 $response.explicacion
 ```
+
+
+### 🔹 Flujo detallado
+
+**Carga del historial:**
+
+- Si existe `historial.json`, se leen las entradas previas.
+- Si no existe, se inicializa vacío.
+
+**Contextualización:**
+
+- Se toman las últimas tres interacciones (si las hay).
+- Se incorporan al prompt como “historial conversacional”.
+
+**Ejecución del modelo:**
+
+- Si se selecciona `gemini`, se hace una llamada directa con `client.models.generate_content`.
+- Si se selecciona `ollama`, se invoca el comando CLI de Ollama.
+
+**Procesamiento de la respuesta:**
+
+- El texto se divide en `<Explicacion>` y `<Codigo>`.
+- Ambos se almacenan por separado.
+
+**Registro:**
+
+Cada interacción se guarda en `historial.json` con:
+
+- Fecha y hora.
+- Mensaje original.
+- Modelo usado.
+- Respuesta estructurada.
+
+**Respuesta HTTP:**
+
+Devuelve un objeto JSON con las secciones:
+
+- `explicacion`
+- `codigo`
+
+---
+
+# 📂 Archivo `historial.json`
+
+Este archivo actúa como una **bitácora persistente** de todas las consultas realizadas.  
+Cada registro incluye:
+
+- `fecha`: marca temporal ISO8601.
+- `mensaje`: consulta original.
+- `modelo`: “gemini” u “ollama”.
+- `explicacion`: explicación generada por el asistente.
+- `codigo`: bloque de código generado.
+
+Esto permite:
+
+✅ Mantener contexto en futuras consultas.  
+✅ Auditar interacciones pasadas.  
+✅ Mejorar trazabilidad del uso de la plataforma.
+
+---
+
+# 🔄 Ejemplo de Respuesta JSON
+
+Una respuesta típica del endpoint `/generar` tiene el siguiente formato:
+
+```json
+{
+  "explicacion": "Este ejemplo muestra cómo controlar un servo usando la librería ideaboard...",
+  "codigo": "from ideaboard import IdeaBoard\nib = IdeaBoard()\nservo = ib.Servo(5)\nservo.angle = 90"
+}
+
+```
