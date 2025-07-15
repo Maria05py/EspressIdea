@@ -75,15 +75,7 @@ Su objetivo es facilitar la creación de proyectos educativos y prototipos robó
 
 ## 🏗️ Arquitectura del Proyecto
 
-```markdown
-```mermaid
-graph TD
-    Usuario -->|HTTP| Servidor_LLM
-    Servidor_LLM -->|Prompt| LLM
-    LLM -->|Respuesta| Servidor_LLM
-    Servidor_LLM -->|UART| ESP32
-    ESP32 -->|Serial| Dispositivo_Python
-```
+
 
 ## 📌 Requisitos previos:
 
