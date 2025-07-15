@@ -91,7 +91,7 @@ Su objetivo es facilitar la creación de proyectos educativos y prototipos robó
 ## Pasos básicos:
 
 Clonar el repositorio:
-```git clone https://github.com/TU_USUARIO/EspressIDEA.git
+```git clone https://github.com/Maria05.py/EspressIDEA.git
 ```
 Instalar dependencias:
 ```
