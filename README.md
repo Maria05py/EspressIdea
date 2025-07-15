@@ -2,7 +2,6 @@
   <img src="logo.png" alt="Logo del proyecto" width="300"/>
 </p>
 
-# EspressIdea 🐍
 EspressIDEA es una plataforma de desarrollo remoto y asistido para microcontroladores que ejecutan Python (MicroPython y CircuitPython). Aprovecha un microcontrolador ESP32 que actúa como un intermediario inteligente, permitiendo:
 
 - Interfaz serial con dispositivos Python (por UART) como si fueran conectados por USB a un PC.
