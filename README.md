@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.png" alt="Logo del proyecto" width="600"/>
+  <img src="logo.png" alt="Logo del proyecto" width="600"/>
 </p>
 
 <h1 align="center">EspressIDEA</h1>
