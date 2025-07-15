@@ -3,7 +3,6 @@
 Este script implementa un **servidor web Flask** que expone una **API REST** para generar código en **CircuitPython** orientado a la placa **IdeaBoard** mediante un modelo de lenguaje grande (**LLM**).  
 Su propósito principal es **asistir a estudiantes, educadores y desarrolladores** en la creación de programas embebidos, proporcionando explicaciones y ejemplos claros, que se almacenan de manera ordenada en un historial persistente.
 
----
 
 # 🛠️ Estructura Principal del Código
 
@@ -38,8 +37,10 @@ Este endpoint acepta peticiones **POST** con un cuerpo JSON que debe incluir:
   "mensaje": "Texto de la consulta o petición",
   "modelo": "gemini" // o "ollama"
 }
+```
 
 📄 Para probar la invocación y llamadas al LLM desde PowerShell, se debe utilizar la siguiente estructura:
+```
 $body = @{
     mensaje = "PROMPT DESEADO"
     modelo = "gemini"
@@ -53,8 +54,10 @@ $response = Invoke-RestMethod `
 
 $response.codigo
 $response.explicacion
+```
 
 🦙 Usando Ollama:
+```
 $body = @{
     mensaje = "PROMPT DESEADO"
     modelo = "ollama"
@@ -68,3 +71,4 @@ $response = Invoke-RestMethod `
 
 $response.codigo
 $response.explicacion
+```
