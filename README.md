@@ -1,6 +1,9 @@
 <p align="center">
   <img src="logo.png" alt="Logo del proyecto" width="600"/>
 </p>
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Issues](https://img.shields.io/github/issues/tuusuario/turepositorio)
+![License](https://img.shields.io/badge/license-CC--BY--NC-green)
 
 EspressIDEA es una plataforma de desarrollo remoto y asistido para microcontroladores que ejecutan Python (MicroPython y CircuitPython). Aprovecha un microcontrolador ESP32 que actúa como un intermediario inteligente, permitiendo:
 
