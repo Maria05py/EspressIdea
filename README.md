@@ -4,19 +4,24 @@
 
 <p align="center">
   <a href="https://github.com/tu_usuario/tu_repositorio">
-    <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue">
+    <img alt="Version"
+         src="https://img.shields.io/badge/version-1.0.0-B82132?style=for-the-badge&logo=github&logoColor=white&labelColor=D2665A">
   </a>
   <a href="https://github.com/tu_usuario/tu_repositorio/issues">
-    <img alt="Issues" src="https://img.shields.io/github/issues/tu_usuario/tu_repositorio">
+    <img alt="Issues"
+         src="https://img.shields.io/badge/issues-open-F2B28C?style=for-the-badge&logo=github&logoColor=white&labelColor=D2665A">
   </a>
   <a href="#">
-    <img alt="Status" src="https://img.shields.io/badge/status-Experimental-orange">
+    <img alt="License"
+         src="https://img.shields.io/badge/license-CC--BY--NC-F6DED8?style=for-the-badge&logo=open-source-initiative&logoColor=B82132&labelColor=D2665A">
   </a>
   <a href="#">
-    <img alt="License" src="https://img.shields.io/badge/license-CC--BY--NC-green">
+    <img alt="Status"
+         src="https://img.shields.io/badge/status-experimental-D2665A?style=for-the-badge&logo=python&logoColor=white&labelColor=B82132">
   </a>
   <a href="https://github.com/tu_usuario/tu_repositorio/commits/main">
-    <img alt="Last commit" src="https://img.shields.io/github/last-commit/tu_usuario/tu_repositorio">
+    <img alt="Last commit"
+         src="https://img.shields.io/badge/last_commit-latest-F2B28C?style=for-the-badge&logo=git&logoColor=B82132&labelColor=D2665A">
   </a>
 </p>
 
