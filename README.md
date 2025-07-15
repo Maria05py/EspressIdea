@@ -5,25 +5,26 @@
 <p align="center">
   <a href="https://github.com/tu_usuario/tu_repositorio">
     <img alt="Version"
-         src="https://img.shields.io/badge/version-1.0.0-B82132?style=for-the-badge&logo=github&logoColor=white&labelColor=D2665A">
+         src="https://img.shields.io/badge/version-1.0.0-F2B28C?style=for-the-badge&logo=github&logoColor=white&labelColor=B82132">
   </a>
   <a href="https://github.com/tu_usuario/tu_repositorio/issues">
     <img alt="Issues"
-         src="https://img.shields.io/badge/issues-open-F2B28C?style=for-the-badge&logo=github&logoColor=white&labelColor=D2665A">
+         src="https://img.shields.io/badge/issues-open-F2B28C?style=for-the-badge&logo=github&logoColor=white&labelColor=B82132">
   </a>
   <a href="#">
     <img alt="License"
-         src="https://img.shields.io/badge/license-CC--BY--NC-F6DED8?style=for-the-badge&logo=open-source-initiative&logoColor=B82132&labelColor=D2665A">
+         src="https://img.shields.io/badge/license-CC--BY--NC-F2B28C?style=for-the-badge&logo=open-source-initiative&logoColor=white&labelColor=B82132">
   </a>
   <a href="#">
     <img alt="Status"
-         src="https://img.shields.io/badge/status-experimental-D2665A?style=for-the-badge&logo=python&logoColor=white&labelColor=B82132">
+         src="https://img.shields.io/badge/status-Experimental-F2B28C?style=for-the-badge&logo=python&logoColor=white&labelColor=B82132">
   </a>
   <a href="https://github.com/tu_usuario/tu_repositorio/commits/main">
     <img alt="Last commit"
-         src="https://img.shields.io/badge/last_commit-latest-F2B28C?style=for-the-badge&logo=git&logoColor=B82132&labelColor=D2665A">
+         src="https://img.shields.io/badge/last_commit-Latest-F2B28C?style=for-the-badge&logo=git&logoColor=white&labelColor=B82132">
   </a>
 </p>
+
 
 
 EspressIDEA es una plataforma de desarrollo remoto y asistido para microcontroladores que ejecutan Python (MicroPython y CircuitPython). Aprovecha un microcontrolador ESP32 que actúa como un intermediario inteligente, permitiendo:
