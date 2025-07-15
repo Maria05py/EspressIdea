@@ -18,14 +18,13 @@ A continuación se describen los componentes y bloques más relevantes:
 - **datetime**: Marca temporal de cada interacción.
 - **os**: Verificación de existencia de historial previo.
 
----
 
 ## 2️⃣ Variables Globales
 
 - `client`: Cliente de Gemini inicializado con tu API Key.
 - `prompt_maestro`: Instrucciones base que definen la personalidad del asistente y el formato de respuesta esperado.
 
----
+
 
 ## 3️⃣ Endpoint `/generar`
 
