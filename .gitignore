@@ -1,17 +1,17 @@
 ### PlatformIO ###
-.pioenvs
-.piolibdeps
-.clang_complete
-.gcc-flags.json
-.pio
+**/.pioenvs
+**/.piolibdeps
+**/.clang_complete
+**/.gcc-flags.json
+**/.pio
 
 ### VisualStudioCode ###
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-!.vscode/*.code-snippets
+**/.vscode/*
+**/!.vscode/settings.json
+**/!.vscode/tasks.json
+**/!.vscode/launch.json
+**/!.vscode/extensions.json
+**/!.vscode/*.code-snippets
 
 # Local History for Visual Studio Code
 .history/
@@ -25,4 +25,5 @@
 .ionide
 
 ### Credemtials
-CREDENTIALs.txt
+**/CREDENTIALs.txt
+EspressIDEA/data/CREDENTIALS.txt
