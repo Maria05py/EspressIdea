@@ -1,27 +1,19 @@
 <p align="center">
-  <img src="Assets/logo.jpg" alt="Logo del proyecto" width="600"/>
+  <img src="Assets/ESPRESSIDEA_004.svg" alt="Logo EspressIDEA" width="1000"/>
 </p>
 
 <p align="center">
-  <a href="https://github.com/tu_usuario/tu_repositorio">
+  <a href="https://github.com/Maria05py/EspressIdea">
     <img alt="Version"
-         src="https://img.shields.io/badge/version-1.0.0-343C4C?style=for-the-badge&logo=github&logoColor=white&labelColor=E93529">
+         src="https://img.shields.io/badge/version-1.0.0-343C4C?style=for-the-badge&logo=github&logoColor=white&labelColor=e8362d">
   </a>
-  <a href="https://github.com/tu_usuario/tu_repositorio/issues">
-    <img alt="Issues"
-         src="https://img.shields.io/badge/issues-open-343C4C?style=for-the-badge&logo=github&logoColor=white&labelColor=E93529">
-  </a>
-  <a href="#">
+  <a href="https://github.com/Maria05py/EspressIdea/blob/main/LICENSE">
     <img alt="License"
-         src="https://img.shields.io/badge/license-CC--BY--NC-343C4C?style=for-the-badge&logo=open-source-initiative&logoColor=white&labelColor=E93529">
+         src="https://img.shields.io/badge/license-CC--BY--NC-343C4C?style=for-the-badge&logo=creativecommons&logoColor=white&labelColor=e8362d">
   </a>
   <a href="#">
     <img alt="Status"
-         src="https://img.shields.io/badge/status-Experimental-343C4C?style=for-the-badge&logo=python&logoColor=white&labelColor=E93529">
-  </a>
-  <a href="https://github.com/tu_usuario/tu_repositorio/commits/main">
-    <img alt="Last commit"
-         src="https://img.shields.io/badge/last_commit-Latest-343C4C?style=for-the-badge&logo=git&logoColor=white&labelColor=E93529">
+         src="https://img.shields.io/badge/status-Experimental-343C4C?style=for-the-badge&logo=python&logoColor=white&labelColor=e8362d">
   </a>
 </p>
 
@@ -35,8 +27,6 @@ EspressIDEA es una plataforma de desarrollo remoto y asistido para microcontrola
 - Integración con modelos de lenguaje (LLM) para generar, explicar y documentar código en tiempo real.
 
 - Compatibilidad con placas sin WiFi nativo, como Raspberry Pi Pico, Metro, Feather M4, entre otras.
-
-
 
 ## 🧭 Tabla de Contenidos
 
@@ -91,7 +81,8 @@ Su objetivo es facilitar la creación de proyectos educativos y prototipos robó
 ## Pasos básicos:
 
 Clonar el repositorio:
-```git clone https://github.com/Maria05.py/EspressIDEA.git
+```
+git clone https://github.com/Maria05.py/EspressIDEA.git
 ```
 Instalar dependencias:
 ```
