@@ -20,8 +20,6 @@
 # EspressIDEA - Avance Preliminar del Proyecto
 
 ## 1. Información del Proyecto
-
-**Nombre del Proyecto:** EspressIDEA  
 **Equipo:**
 - Emanuel Mena Araya (Backend)
 - Angel Cabrera Mata (Frontend)
