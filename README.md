@@ -17,6 +17,68 @@
   </a>
 </p>
 
+# EspressIDEA - Avance Preliminar del Proyecto
+
+## 1. Información del Proyecto
+
+**Nombre del Proyecto:** EspressIDEA  
+- Emanuel Mena Araya (Backend)
+- Angel Cabrera Mata (Frontend)
+- María Jesús Rodríguez Molina (Trabajo con LLMs e investigación)
+- Thais Hernández Quesada (Trabajo con LLMs e investigación)
+
+---
+
+## 2. Descripción y Justificación
+
+**Problema que se aborda:**  
+El aprendizaje de programación embebida con microcontroladores resulta complejo para principiantes debido a la necesidad de configurar múltiples herramientas, instalar software específico y conocer lenguajes como Python y Micropython, por lo que .
+
+**Importancia y contexto:**  
+Existe una creciente demanda de herramientas educativas accesibles que permitan enseñar programación y robótica desde edades tempranas. EspressIDEA facilita este proceso al centralizar el desarrollo sobre Python y ofrecer asistencia en tiempo real mediante modelos de lenguaje.EspressIDEA es una plataforma de desarrollo remoto y asistido para microcontroladores que ejecutan Python (MicroPython y CircuitPython). Aprovecha un microcontrolador ESP32 que actúa como un intermediario inteligente, permitiendo:
+- Interfaz serial con dispositivos Python (por UART) como si fueran conectados por USB a un PC.
+- Servidor web embebido que proporciona un editor de código accesible por navegador.
+- Integración con modelos de lenguaje (LLM) para generar, explicar y documentar código en tiempo real.
+- Compatibilidad con placas sin WiFi nativo, como Raspberry Pi Pico, Metro, Feather M4, entre otras.
+
+**Usuarios/beneficiarios:**  
+- Estudiantes de primaria, secundaria y universidad.  
+- Docentes de tecnología, computación o robótica.  
+- Aficionados a la electrónica y makers.  
+- Instituciones educativas sin laboratorios sofisticados.
+
+---
+
+## 3. Objetivos del Proyecto
+
+**Objetivo General:**  
+Desarrollar una plataforma interactiva de propósito educativo que facilite la enseñanza de programación electrónica, centrada en microcontroladores Espressif y en la integración de modelos de lenguaje avanzados.
+
+**Objetivos Específicos:**  
+- Expandir el uso de microcontroladores en entornos educativos.  
+- Fomentar el desarrollo de proyectos IoT, electrónica y robótica para todas las edades.  
+- Fructificar la integración de modelos de lenguaje en el desarrollo y aprendizaje de proyectos electrónicos.  
+- Ampliar la base de conocimiento de principiantes en programación de manera interactiva y centralizada.
+
+---
+
+## 4. Requisitos Iniciales
+
+Lista breve de lo que el sistema debe lograr:
+
+- Requisito 1: Permitir la conexión UART entre el ESP32 y microcontroladores sin WiFi.  
+- Requisito 2: Exponer un editor de código accesible vía navegador web local.  
+- Requisito 3: Integrar un servidor Flask con capacidad de generar y explicar código usando Gemini u Ollama.
+
+---
+
+## 5. Diseño Preliminar del Sistema
+
+**Arquitectura inicial (diagrama):**
+
+
+----------------------------
+
 
 EspressIDEA es una plataforma de desarrollo remoto y asistido para microcontroladores que ejecutan Python (MicroPython y CircuitPython). Aprovecha un microcontrolador ESP32 que actúa como un intermediario inteligente, permitiendo:
 
@@ -28,70 +90,3 @@ EspressIDEA es una plataforma de desarrollo remoto y asistido para microcontrola
 
 - Compatibilidad con placas sin WiFi nativo, como Raspberry Pi Pico, Metro, Feather M4, entre otras.
 
-## 🧭 Tabla de Contenidos
-
-- [Descripción](#descripción)
-- [Características](#características)
-- [Arquitectura del Proyecto](#arquitectura-del-proyecto)
-- [Instalación](#instalación)
-- [Uso](#uso)
-- [Montaje de Hardware](#montaje-de-hardware)
-- [Ejemplos](#ejemplos)
-- [Contribuir](#contribuir)
-- [Licencia](#licencia)
-- [Créditos](#créditos)
-
----
-
-## 📖 Descripción
-
-**EspressIDEA** es una plataforma de desarrollo remoto y asistido para microcontroladores que ejecutan Python (MicroPython y CircuitPython).  
-Aprovecha un microcontrolador ESP32 actuando como intermediario inteligente y un servidor de IA que permite generar, explicar y ejecutar código en tiempo real.
-
-Su objetivo es facilitar la creación de proyectos educativos y prototipos robóticos sin necesidad de experiencia avanzada en programación embebida.
-
----
-
-## ✨ Características
-
-- 🟢 Interfaz serial UART con dispositivos Python, como si fueran conectados vía USB.
-- 🟢 Servidor web embebido que actúa como editor de código accesible por navegador.
-- 🟢 Integración con modelos de lenguaje (Gemini, Ollama) para generación de código.
-- 🟢 Soporte para placas sin WiFi nativo (Pi Pico, Metro, Feather).
-- 🟢 Almacenamiento de historial de consultas y ejemplos.
-- 🟢 Código de ejemplo y documentación en proceso de desarrollo.
-
----
-
-## 🏗️ Arquitectura del Proyecto
-
-
-
-## 📌 Requisitos previos:
-
-- Python 3.8+
-
-- Dependencias de servidor LLM (Flask, google.genai)
-
-- ESP32 configurado con MicroPython/CircuitPython
-
-- (Opcional) Ollama instalado si usarás ese modelo local
-
-
-## Pasos básicos:
-
-Clonar el repositorio:
-```
-git clone https://github.com/Maria05.py/EspressIDEA.git
-```
-Instalar dependencias:
-```
-cd Servidor_LLM
-```
-```
-pip install -r requirements.txt
-```
-Configurar variables de entorno:
-```
-export GEMINI_API_KEY="TU_API_KEY"
-```
