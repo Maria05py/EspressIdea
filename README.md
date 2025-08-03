@@ -32,7 +32,7 @@
 ## 2. Descripción y Justificación
 
 **Problema que se aborda:**  
-El aprendizaje de programación embebida con microcontroladores resulta complejo para principiantes debido a la necesidad de configurar múltiples herramientas, instalar software específico y conocer lenguajes como C o C++.
+El aprendizaje de programación embebida con microcontroladores resulta complejo para principiantes debido a la necesidad de configurar múltiples herramientas, instalar software específico y conocer lenguajes como Python y Micropython.
 
 **Importancia y contexto:**  
 Existe una creciente demanda de herramientas educativas accesibles que permitan enseñar programación y robótica desde edades tempranas. EspressIDEA facilita este proceso al centralizar el desarrollo sobre Python y ofrecer asistencia en tiempo real mediante modelos de lenguaje. EspressIDEA es una plataforma de desarrollo remoto y asistido para microcontroladores que ejecutan Python (MicroPython y CircuitPython). Aprovecha un microcontrolador ESP32 que actúa como un intermediario inteligente, permitiendo:
@@ -42,7 +42,7 @@ Existe una creciente demanda de herramientas educativas accesibles que permitan 
 - Compatibilidad con placas sin WiFi nativo, como Raspberry Pi Pico, Metro, Feather M4, entre otras.
 
 **Usuarios/beneficiarios:**  
-- Estudiantes de primaria, secundaria y universidad.  
+- Estudiantes de secundaria y universidad.  
 - Docentes de tecnología, computación o robótica.  
 - Aficionados a la electrónica y makers.  
 - Instituciones educativas sin laboratorios sofisticados.
