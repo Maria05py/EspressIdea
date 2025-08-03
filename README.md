@@ -55,10 +55,10 @@ Existe una creciente demanda de herramientas educativas accesibles que permitan 
 •	Desarrollar una plataforma interactiva de propósito educativo que facilita la enseñanza y aprendizaje de programación electrónica, centrado en microcontroladores Esspresif y la integración de modelos de lenguaje avanzados, con el fin de capacitar estudiantes de diversas edades en la construcción de proyectos tecnológicos. 
 
 **Objetivos Específicos:**  
-•	Expandir el uso de microcontroladores en entornos educativos.
-•	Fomentar el desarrollo de proyectos IOT, electrónica y robótica para todas las edades. 
-•	Fructificar la integración de modelos de lenguaje en el desarrollo y aprendizaje de proyectos electrónicos.
-•	Ampliar la base de conocimiento de principiantes en programación de manera interactiva y centralizada.
+- Expandir el uso de microcontroladores en entornos educativos.
+- Fomentar el desarrollo de proyectos IOT, electrónica y robótica para todas las edades. 
+- Fructificar la integración de modelos de lenguaje en el desarrollo y aprendizaje de proyectos electrónicos.
+- Ampliar la base de conocimiento de principiantes en programación de manera interactiva y centralizada.
 
 ---
 
