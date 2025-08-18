@@ -6,15 +6,13 @@
   <title>EspressIdea</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="/Estilos/test.css" />
-
-   <!-- Carga del módulo de arranque -->
-  <script type="module" src="/JavaScript/index.js"></script>
 </head>
 <body>
   <div class="app">
     <header class="logo">LOGO EspressIdea</header>
 
     <div class="main-container">
+      
       <aside class="sidebar">
         <div class="device-title">Dispositivo Python</div>
         <ul class="file-tree">
@@ -34,7 +32,7 @@
       <main class="code-area">
         <div class="tabs">
           <div class="tab active">foo.py</div>
-          <div class="tab">bar.py <span class="close-tab">x</span></div>
+          <div class="tab">bar.py <span class="close-tab">×</span></div>
         </div>
 
         <div class="controls">
@@ -75,23 +73,16 @@ if __name__ == "__main__":
           </textarea>
         </div>
 
-        <!-- Consola tipo terminal (entrada/salida en un solo flujo) -->
         <div class="console">
-          <div class="console-header">
-            <span class="dot red"></span>
-            <span class="dot yellow"></span>
-            <span class="dot green"></span>
-            <span class="title">REPL CircuitPython</span>
-            <span id="wsStatus" class="status badge">Conectando…</span>
-          </div>
-
-          <!-- Único área editable que actúa como terminal -->
-          <div id="terminal" class="console-terminal" contenteditable="true" spellcheck="false"></div>
+          <p>0;2;Wi-Fi off | REPL | 9.2.4</p>
+          <p>Adafruit CircuitPython 9.2.4 on 2025-01-29; CRiobernetica IdeaBoard with ESP32</p>
+          <p>&gt;&gt;&gt; print("hola mundo")</p>
         </div>
       </main>
 
       <aside class="right-panel">
-        <div id="chatMessages" class="chat-container"></div>
+        <div id="chatMessages" class="chat-container">
+        </div>
         <div class="input-area">
           <input type="text" id="chatInput" placeholder="Escribe un mensaje..." />
           <button id="sendBtn">Enviar</button>
@@ -99,5 +90,8 @@ if __name__ == "__main__":
       </aside>
     </div>
   </div>
+
+  <script src="/JavaScript/test.js"></script>
+  
 </body>
 </html>
