@@ -2,6 +2,8 @@
 import { initTerminalWS } from './terminal.js';
 import { initFS, FS, ensureIdle as ensureIdleFS } from './fs.js';
 import { initEditor } from './editor.js'; // ← NUEVO
+import { initAIChat } from './ai-chat.js';
+
 
 let term = null;
 let busy = false;
@@ -38,4 +40,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initFS();
   initEditor(); // ← NUEVO: activa manejo de pestañas y textarea
   wireUI();
+  initAIChat()
 });

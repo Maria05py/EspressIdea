@@ -11,11 +11,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <!-- Estilos -->
   <link rel="stylesheet" href="/Estilos/test.css" />
-  <!-- Tu orquestador -->
+  <!-- Orquestador -->
   <script type="module" src="/JavaScript/index.js"></script>
 
   <style>
-    /* Unos estilos mínimos para el menú contextual */
     .ctx-menu{
       position: fixed; z-index: 10000; min-width: 180px;
       background: #1e1e1e; border: 1px solid #333; border-radius: 6px;
@@ -55,8 +54,8 @@
 
       <!-- Área principal -->
       <main class="code-area">
-        <div class="tabs">
-          <div class="tab active" id="activeTab">sin nombre</div>
+        <div class="tabs" id="tabsBar">
+          <div class="tab active" id="activeTab"><span class="label">sin nombre</span></div>
           <div class="tab" style="display:none"><span class="close-tab">x</span></div>
         </div>
 
@@ -67,7 +66,9 @@
           <button class="btn download" id="btnDownload" title="Descargar archivo activo"><i class="bi bi-download"></i></button>
           <button class="btn upload" id="btnUpload" title="Subir archivo a carpeta actual"><i class="bi bi-upload"></i></button>
           <button class="tag green">HOST</button>
-          <button class="tag red">IA</button>
+          <!-- en tu index.html, en la barra de controles -->
+<button class="tag red" id="tagAI">IA</button>
+
           <button class="tag green">Dispositivo python</button>
         </div>
 
@@ -75,7 +76,7 @@
           <textarea id="codeEditor" spellcheck="false" placeholder="# Selecciona un archivo para editarlo"></textarea>
         </div>
 
-        <!-- Consola (Terminal la maneja tu index.js) -->
+        <!-- Consola -->
         <div class="console">
           <div class="console-header">
             <span class="dot red"></span>
@@ -98,88 +99,5 @@
       </aside>
     </div>
   </div>
-
-  <!-- Bloque de prueba: ejecutar el contenido del editor activo -->
-  <script>
-  (function(){
-    function parseJSON(res){
-      return res.text().then(txt=>{
-        try { return JSON.parse(txt); }
-        catch { throw new Error('Respuesta no JSON: ' + txt.slice(0,120)); }
-      });
-    }
-
-    async function execActiveEditor(){
-      const ta = document.getElementById('codeEditor');
-      const status = document.getElementById('wsStatus');
-      const btn = document.querySelector('.btn.play');
-      const term = document.getElementById('terminal');
-
-      const code = ta ? ta.value : '';
-      if (!code.trim()){
-        alert('El editor está vacío.');
-        return;
-      }
-
-      if (btn) btn.disabled = true;
-      if (status){
-        status.classList.remove('success','danger');
-        status.classList.add('warn');
-        status.textContent = 'Ejecutando...';
-      }
-
-      try{
-        const resp = await fetch('/api/exec', {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
-          body: code
-        });
-        const j = await parseJSON(resp);
-
-        if (!j.ok) throw new Error(j.stderr || 'Fallo /api/exec');
-
-        // Mostrar salida en la consola visual
-        if (term){
-          const hdr = document.createElement('div');
-          hdr.style.opacity = '0.8';
-          hdr.style.margin = '6px 0';
-          hdr.textContent = '⮕ Salida de ejecución';
-          const pre = document.createElement('pre');
-          pre.textContent = j.stdout || '';
-          term.appendChild(hdr);
-          term.appendChild(pre);
-          term.scrollTop = term.scrollHeight;
-        } else {
-          alert(j.stdout || 'Ejecutado sin salida.');
-        }
-
-        if (status){
-          status.classList.remove('warn');
-          status.classList.add('success');
-          status.textContent = 'Ejecutado';
-        }
-      } catch(e){
-        console.error(e);
-        if (status){
-          status.classList.remove('warn');
-          status.classList.add('danger');
-          status.textContent = 'Error';
-        }
-        alert('Error al ejecutar: ' + e.message);
-      } finally {
-        if (btn) btn.disabled = false;
-      }
-    }
-
-    // Exponer por si quieres llamarlo desde consola
-    window.execActiveEditor = execActiveEditor;
-
-    // Click al botón ▶️
-    document.addEventListener('DOMContentLoaded', ()=>{
-      const runBtn = document.querySelector('.btn.play');
-      if (runBtn) runBtn.addEventListener('click', execActiveEditor);
-    });
-  })();
-  </script>
 </body>
 </html>
