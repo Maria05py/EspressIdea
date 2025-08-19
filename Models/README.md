@@ -121,4 +121,11 @@ $response = Invoke-RestMethod `
 $response.explicacion
 $response.codigo
 ```
+## Persistencia del Historial
+
+Cada interacción se guarda en un archivo historial_<placa>.json, lo que permite:
+
+- Mantener contexto entre consultas consecutivas.
+- Auditar conversaciones pasadas.
+- Facilitar el seguimiento y mejora del aprendizaje.
 
