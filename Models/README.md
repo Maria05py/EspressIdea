@@ -1,7 +1,6 @@
 # Generador de Código en CircuitPython con LLMs
 
-Este proyecto implementa un **servidor web con Flask** que expone un **endpoint REST** (`/generar`) para la creación de programas en **CircuitPython** y **MicroPython** orientados a diferentes placas de desarrollo Espressif.  
-El sistema utiliza **modelos de lenguaje (LLMs)**, tanto locales (Ollama utilizando Deepsek en este caso) como en la nube (Gemini), para generar código acompañado de explicaciones educativas.  
+Este proyecto implementa un **servidor web con Flask** que expone un **endpoint REST** (`/generar`) para la creación de programas en **CircuitPython** y **MicroPython** orientados a diferentes placas de desarrollo Espressif.  El sistema utiliza **modelos de lenguaje (LLMs)**, tanto locales (Ollama utilizando Deepsek en este caso) como en la nube (Gemini), para generar código acompañado de explicaciones educativas.  
 El objetivo principal es **asistir a estudiantes, educadores y desarrolladores** en la elaboración de programas embebidos, facilitando el aprendizaje y el desarrollo de proyectos de robótica y automatización.
 
 ---
@@ -120,3 +119,4 @@ $response = Invoke-RestMethod `
 
 $response.explicacion
 $response.codigo
+
