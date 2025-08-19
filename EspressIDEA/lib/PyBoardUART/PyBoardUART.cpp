@@ -363,7 +363,12 @@ ErrorCode PyBoardUART::waitForReplPrompt(uint32_t timeoutMs) {
     std::string acc; acc.reserve(512);
     uint8_t tmp[128];
 
-    while ((uint64_t)esp_timer_get_time() < deadline) {
+    interrupt();
+    vTaskDelay(pdMS_TO_TICKS(200));
+
+    return ErrorCode::OK;
+
+    /*while ((uint64_t)esp_timer_get_time() < deadline) {
         int n = uart_read_bytes(uartNum, tmp, sizeof(tmp), pdMS_TO_TICKS(50));
         if (n > 0) {
             acc.append(reinterpret_cast<const char *>(tmp), n);
@@ -373,7 +378,7 @@ ErrorCode PyBoardUART::waitForReplPrompt(uint32_t timeoutMs) {
         vTaskDelay(pdMS_TO_TICKS(5));
     }
     setError("Timeout esperando prompt '>>>'");
-    return ErrorCode::TIMEOUT;
+    return ErrorCode::TIMEOUT;*/
 }
 
 ErrorCode PyBoardUART::syncReplCircuitPython(uint32_t timeoutMs) {

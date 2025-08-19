@@ -1,8 +1,7 @@
 // /JavaScript/index.js
-// Orquesta el flujo: STOP => ensure_idle -> listar '/' -> conectar WS.
-
 import { initTerminalWS } from './terminal.js';
 import { initFS, FS, ensureIdle as ensureIdleFS } from './fs.js';
+import { initEditor } from './editor.js'; // ← NUEVO
 
 let term = null;
 let busy = false;
@@ -16,11 +15,8 @@ async function onStopClick() {
   if (busy) return;
   setBusy(true);
   try {
-    // 1) Parar/reiniciar y esperar prompt >>>
     await ensureIdleFS();
-    // 2) Listar raíz
     await FS.listDir('/');
-    // 3) Conectar WS
     if (!term) {
       term = initTerminalWS();
     } else if (!term.isConnected()) {
@@ -40,5 +36,6 @@ function wireUI() {
 
 document.addEventListener('DOMContentLoaded', () => {
   initFS();
+  initEditor(); // ← NUEVO: activa manejo de pestañas y textarea
   wireUI();
 });

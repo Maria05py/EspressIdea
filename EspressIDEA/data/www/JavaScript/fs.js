@@ -1,6 +1,35 @@
 // /JavaScript/fs.js
 // Módulo ES para el explorador/FS del dispositivo Python.
 // Exporta: initFS(), ensureIdle(), FS (API pública)
+// --- NUEVO: EventEmitter muy simple basado en EventTarget ---
+const emitter = new EventTarget();
+export function on(eventName, handler){
+  emitter.addEventListener(eventName, (ev) => handler(ev.detail));
+}
+export function off(eventName, handler){
+  emitter.removeEventListener(eventName, handler);
+}
+
+// --- NUEVO: bandera para delegar el pintado al editor externo ---
+let externalEditor = false;
+export function setExternalEditor(on){ externalEditor = !!on; }
+
+// --- NUEVO: writeFile arbitrario (sin depender del textarea interno) ---
+export function writeFile(path, text){
+  const b64 = base64Encode(text || "");
+  return ensureIdle()
+    .then(() => fetchJSON("/api/fs/write?path=" + encodeURIComponent(path), {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: b64
+    }))
+    .then(res => {
+      if (!res.ok) throw new Error(res.error || "write failed");
+      return listDir(state.cwd).catch(()=>{});
+    });
+}
+
+
 
 const $  = (sel, root) => (root || document).querySelector(sel);
 const $$ = (sel, root) => Array.prototype.slice.call((root || document).querySelectorAll(sel));
@@ -170,13 +199,23 @@ export function openFile(path){
     .then(j => {
       if (!j.ok) throw new Error(j.error || "read failed");
       const text = base64Decode(j.base64 || "");
-      els.editor.value = text;
       state.openFile = path;
-      els.tab.textContent = path.split("/").pop() || path;
-      markSelectedFileOpen(path);
+
+      if (externalEditor) {
+        // Notificar al editor modular
+        emitter.dispatchEvent(new CustomEvent("file:opened", {
+          detail: { path, text }
+        }));
+      } else {
+        // Comportamiento legacy (sin editor modular)
+        els.editor.value = text;
+        els.tab.textContent = path.split("/").pop() || path;
+        markSelectedFileOpen(path);
+      }
     })
     .catch(e => alert(e.message));
 }
+
 
 export function saveActiveFile(){
   if (!state.openFile) { alert("No hay archivo activo."); return Promise.resolve(); }
@@ -453,6 +492,6 @@ export function initFS(){
 export const FS = {
   listDir, openFile, saveActiveFile, downloadActiveFile, uploadToCwd,
   apiInfo, apiExists, apiMkdir, apiRename, apiDeleteFile, apiRmdir,
-  ensureIdle,
+  ensureIdle, writeFile, // ← nuevo
   get state(){ return Object.assign({}, state); }
 };

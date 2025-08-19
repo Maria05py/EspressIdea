@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <!-- Estilos -->
   <link rel="stylesheet" href="/Estilos/test.css" />
+  <!-- Tu orquestador -->
   <script type="module" src="/JavaScript/index.js"></script>
 
   <style>
@@ -21,9 +22,7 @@
       box-shadow: 0 6px 18px rgba(0,0,0,.35); padding: 6px 0; display:none;
       color:#eee; font-size: 14px;
     }
-    .ctx-menu .item{
-      padding: 8px 12px; cursor: pointer; display:flex; align-items:center; gap:8px;
-    }
+    .ctx-menu .item{ padding: 8px 12px; cursor: pointer; display:flex; align-items:center; gap:8px; }
     .ctx-menu .item:hover{ background:#2a2a2a; }
     .ctx-menu .sep{ height:1px; background:#333; margin:6px 0; }
     .sidebar .toolbar{
@@ -100,5 +99,87 @@
     </div>
   </div>
 
+  <!-- Bloque de prueba: ejecutar el contenido del editor activo -->
+  <script>
+  (function(){
+    function parseJSON(res){
+      return res.text().then(txt=>{
+        try { return JSON.parse(txt); }
+        catch { throw new Error('Respuesta no JSON: ' + txt.slice(0,120)); }
+      });
+    }
+
+    async function execActiveEditor(){
+      const ta = document.getElementById('codeEditor');
+      const status = document.getElementById('wsStatus');
+      const btn = document.querySelector('.btn.play');
+      const term = document.getElementById('terminal');
+
+      const code = ta ? ta.value : '';
+      if (!code.trim()){
+        alert('El editor está vacío.');
+        return;
+      }
+
+      if (btn) btn.disabled = true;
+      if (status){
+        status.classList.remove('success','danger');
+        status.classList.add('warn');
+        status.textContent = 'Ejecutando...';
+      }
+
+      try{
+        const resp = await fetch('/api/exec', {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: code
+        });
+        const j = await parseJSON(resp);
+
+        if (!j.ok) throw new Error(j.stderr || 'Fallo /api/exec');
+
+        // Mostrar salida en la consola visual
+        if (term){
+          const hdr = document.createElement('div');
+          hdr.style.opacity = '0.8';
+          hdr.style.margin = '6px 0';
+          hdr.textContent = '⮕ Salida de ejecución';
+          const pre = document.createElement('pre');
+          pre.textContent = j.stdout || '';
+          term.appendChild(hdr);
+          term.appendChild(pre);
+          term.scrollTop = term.scrollHeight;
+        } else {
+          alert(j.stdout || 'Ejecutado sin salida.');
+        }
+
+        if (status){
+          status.classList.remove('warn');
+          status.classList.add('success');
+          status.textContent = 'Ejecutado';
+        }
+      } catch(e){
+        console.error(e);
+        if (status){
+          status.classList.remove('warn');
+          status.classList.add('danger');
+          status.textContent = 'Error';
+        }
+        alert('Error al ejecutar: ' + e.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    // Exponer por si quieres llamarlo desde consola
+    window.execActiveEditor = execActiveEditor;
+
+    // Click al botón ▶️
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const runBtn = document.querySelector('.btn.play');
+      if (runBtn) runBtn.addEventListener('click', execActiveEditor);
+    });
+  })();
+  </script>
 </body>
 </html>
