@@ -1,47 +1,98 @@
-# 🧩 Descripción del Código
+# Generador de Código en CircuitPython con LLMs
 
-Este script implementa un **servidor web Flask** que expone una **API REST** para generar código en **CircuitPython** orientado a la placa **IdeaBoard** mediante un modelo de lenguaje grande (**LLM**).  
-Su propósito principal es **asistir a estudiantes, educadores y desarrolladores** en la creación de programas embebidos, proporcionando explicaciones y ejemplos claros, que se almacenan de manera ordenada en un historial persistente.
+Este proyecto implementa un **servidor web con Flask** que expone un **endpoint REST** (`/generar`) para la creación de programas en **CircuitPython** y **MicroPython** orientados a diferentes placas de desarrollo Espressif.  
+El sistema utiliza **modelos de lenguaje (LLMs)**, tanto locales (Ollama utilizando Deepsek en este caso) como en la nube (Gemini), para generar código acompañado de explicaciones educativas.  
+El objetivo principal es **asistir a estudiantes, educadores y desarrolladores** en la elaboración de programas embebidos, facilitando el aprendizaje y el desarrollo de proyectos de robótica y automatización.
 
+---
 
-# 🛠️ Estructura Principal del Código
+## Estructura General
 
-A continuación se describen los componentes y bloques más relevantes:
+### Dependencias
 
+- **Flask**: framework web para exponer la API REST.
+- **subprocess**: ejecución de comandos externos (para Ollama).
+- **json**: lectura y escritura de historiales persistentes.
+- **google.genai**: cliente oficial de Gemini.
+- **datetime**: gestión de marcas temporales.
+- **os**: verificación de existencia de archivos de historial.
 
-## 1️⃣ Dependencias
+---
 
-- **Flask**: Framework web para exponer el endpoint `/generar`.
-- **subprocess**: Permite ejecutar comandos de terminal (en este caso, para Ollama).
-- **json**: Serializa y deserializa historial de conversaciones.
-- **google.genai**: Cliente oficial para la API Gemini.
-- **datetime**: Marca temporal de cada interacción.
-- **os**: Verificación de existencia de historial previo.
+## Configuración de Modelos y Prompts
 
+El sistema soporta múltiples placas, cada una con un **prompt maestro** que define:
 
-## 2️⃣ Variables Globales
+- Información técnica de la placa.  
+- Librerías disponibles.  
+- Expectativas sobre el estilo y formato de respuesta.  
+- Reglas para generar código educativo y comentado.  
 
-- `client`: Cliente de Gemini inicializado con tu API Key.
-- `prompt_maestro`: Instrucciones base que definen la personalidad del asistente y el formato de respuesta esperado.
+Actualmente, se incluyen los siguientes perfiles:
 
+- **IdeaBoard** (ESP32-WROOM-32E, CRCibernética, Costa Rica).  
+- **DOIT ESP32 DevKit V1**.  
+- **Adafruit ItsyBitsy M4 Express**.  
 
+Cada prompt establece lineamientos sobre librerías, mapeo de pines y formato esperado de salida.
 
-## 3️⃣ Endpoint `/generar`
+---
 
-Este endpoint acepta peticiones **POST** con un cuerpo JSON que debe incluir:
+## Endpoint `/generar`
+
+El endpoint recibe solicitudes **POST** con un cuerpo JSON de la siguiente forma:
 
 ```json
 {
-  "mensaje": "Texto de la consulta o petición",
+  "mensaje": "Texto con la petición o consulta",
+  "placa": "ideaboard",
   "modelo": "gemini" // o "ollama"
 }
 ```
 
-📄 Para probar la invocación y llamadas al LLM desde PowerShell, se debe utilizar la siguiente estructura:
-```
+## Flujo de procesamiento
+
+### Validación de placa
+- Verifica que la placa indicada tenga un prompt configurado.
+
+### Carga de historial
+- Se utiliza un archivo `historial_<placa>.json` para cada tipo de placa.  
+- Si existe, se cargan las interacciones previas.  
+- Se toman hasta las tres últimas interacciones como contexto adicional.  
+
+### Construcción del prompt
+- Combina el prompt maestro de la placa con el historial y la nueva consulta del usuario.  
+
+### Invocación del modelo
+- **Gemini**: llamada a `client.models.generate_content`.  
+- **Ollama**: ejecución mediante CLI con `subprocess`.  
+
+### Procesamiento de la respuesta
+- Se busca dividir la salida en dos secciones: `<Explicacion>` y `<Codigo>`.  
+- Si no se encuentra la etiqueta `<Codigo>`, todo el texto se almacena como explicación.  
+
+### Registro de interacción
+Cada interacción se almacena en `historial_<placa>.json` con:
+- Fecha y hora.  
+- Mensaje original.  
+- Modelo utilizado.  
+- Explicación y código generados.  
+
+### Respuesta HTTP
+Se devuelve un objeto JSON con las claves:
+- `explicacion`  
+- `codigo`  
+
+---
+
+## Ejemplo de Uso en PowerShell
+
+### Con Gemini
+```powershell
 $body = @{
-    mensaje = "PROMPT DESEADO"
-    modelo = "gemini"
+    mensaje = "Encender un LED con IdeaBoard"
+    placa   = "ideaboard"
+    modelo  = "gemini"
 } | ConvertTo-Json
 
 $response = Invoke-RestMethod `
@@ -50,15 +101,15 @@ $response = Invoke-RestMethod `
   -Headers @{ "Content-Type" = "application/json" } `
   -Body $body
 
-$response.codigo
 $response.explicacion
+$response.codigo
 ```
 
-🦙 Usando Ollama:
-```
+### Con Gemini
 $body = @{
-    mensaje = "PROMPT DESEADO"
-    modelo = "ollama"
+    mensaje = "Mover un servo conectado al pin 5"
+    placa   = "ideaboard"
+    modelo  = "ollama"
 } | ConvertTo-Json
 
 $response = Invoke-RestMethod `
@@ -67,78 +118,5 @@ $response = Invoke-RestMethod `
   -Headers @{ "Content-Type" = "application/json" } `
   -Body $body
 
-$response.codigo
 $response.explicacion
-```
-
-
-### 🔹 Flujo detallado
-
-**Carga del historial:**
-
-- Si existe `historial.json`, se leen las entradas previas.
-- Si no existe, se inicializa vacío.
-
-**Contextualización:**
-
-- Se toman las últimas tres interacciones (si las hay).
-- Se incorporan al prompt como “historial conversacional”.
-
-**Ejecución del modelo:**
-
-- Si se selecciona `gemini`, se hace una llamada directa con `client.models.generate_content`.
-- Si se selecciona `ollama`, se invoca el comando CLI de Ollama.
-
-**Procesamiento de la respuesta:**
-
-- El texto se divide en `<Explicacion>` y `<Codigo>`.
-- Ambos se almacenan por separado.
-
-**Registro:**
-
-Cada interacción se guarda en `historial.json` con:
-
-- Fecha y hora.
-- Mensaje original.
-- Modelo usado.
-- Respuesta estructurada.
-
-**Respuesta HTTP:**
-
-Devuelve un objeto JSON con las secciones:
-
-- `explicacion`
-- `codigo`
-
----
-
-# 📂 Archivo `historial.json`
-
-Este archivo actúa como una **bitácora persistente** de todas las consultas realizadas.  
-Cada registro incluye:
-
-- `fecha`: marca temporal ISO8601.
-- `mensaje`: consulta original.
-- `modelo`: “gemini” u “ollama”.
-- `explicacion`: explicación generada por el asistente.
-- `codigo`: bloque de código generado.
-
-Esto permite:
-
-✅ Mantener contexto en futuras consultas.  
-✅ Auditar interacciones pasadas.  
-✅ Mejorar trazabilidad del uso de la plataforma.
-
----
-
-# 🔄 Ejemplo de Respuesta JSON
-
-Una respuesta típica del endpoint `/generar` tiene el siguiente formato:
-
-```json
-{
-  "explicacion": "Este ejemplo muestra cómo controlar un servo usando la librería ideaboard...",
-  "codigo": "from ideaboard import IdeaBoard\nib = IdeaBoard()\nservo = ib.Servo(5)\nservo.angle = 90"
-}
-
-```
+$response.codigo
