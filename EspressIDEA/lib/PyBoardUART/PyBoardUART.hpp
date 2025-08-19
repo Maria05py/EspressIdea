@@ -167,6 +167,12 @@ namespace PyBoard
         ErrorCode listDir(const std::string &path, std::vector<FileInfo> &files);
         ErrorCode readFile(const std::string &path, std::string &content); // Returns Base64
         ErrorCode writeFile(const std::string &path, const std::string &base64Content);
+        // Escribe un trozo binario en 'path'.
+// append=false => crea/trunca ('wb'), append=true => agrega ('ab').
+ErrorCode writeFileChunk(const std::string& path,
+                         const uint8_t* data, size_t len,
+                         bool append);
+
         ErrorCode readFileRaw(const std::string &path, std::vector<uint8_t> &content);
         ErrorCode writeFileRaw(const std::string &path, const std::vector<uint8_t> &content);
         ErrorCode deleteFile(const std::string &path);

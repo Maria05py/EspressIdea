@@ -750,6 +750,60 @@ ErrorCode PyBoardUART::writeFile(const std::string &path, const std::string &bas
     return writeFileRaw(path, rawContent);
 }
 
+ErrorCode PyBoardUART::writeFileChunk(const std::string& path,
+                                      const uint8_t* data, size_t len,
+                                      bool append) {
+    // 1) Abrir en modo adecuado
+    std::string openCmd =
+        "f=open(" + pyQuote(path) + (append ? ",'ab')\n" : ",'wb')\n") +
+        "w=f.write";
+    {
+        ErrorCode e = exec(openCmd);
+        if (e != ErrorCode::OK) return e;
+    }
+
+    // 2) Base64 del trozo
+    std::vector<uint8_t> v(data, data + len);
+    std::string b64 = base64Encode(v);
+
+    // 3) Escribir + sentinelas para robustez
+    std::string writeCmd =
+        "try:\n"
+        " import ubinascii as b\n"
+        "except ImportError:\n"
+        " import binascii as b\n"
+        "x=b.a2b_base64(" + pyQuote(b64) + ")\n"
+        "w(x)\n"
+        "print('@@WCHUNK', len(x))\n";
+
+    std::string out;
+    ErrorCode e2 = exec(writeCmd, out);
+    if (e2 != ErrorCode::OK) {
+        exec("f.close()");
+        return e2;
+    }
+
+    // (Opcional) validar que vimos @@WCHUNK N
+    bool ok=false;
+    {
+        stripCR(out);
+        std::istringstream is(out);
+        std::string line;
+        while (std::getline(is, line)) {
+            if (!line.empty() && line.back()=='\r') line.pop_back();
+            int n=0;
+            if (std::sscanf(line.c_str(), "@@WCHUNK %d", &n) == 1) { ok = (n==(int)len); break; }
+        }
+    }
+    exec("f.close()");
+    if (!ok) {
+        setError("writeFileChunk: missing @@WCHUNK ack");
+        return ErrorCode::EXEC_ERROR;
+    }
+    return ErrorCode::OK;
+}
+
+
 ErrorCode PyBoardUART::readFileRaw(const std::string &path, std::vector<uint8_t> &content) {
     content.clear();
 
@@ -757,29 +811,65 @@ ErrorCode PyBoardUART::readFileRaw(const std::string &path, std::vector<uint8_t>
     ErrorCode err = getFileInfo(path, info);
     if (err != ErrorCode::OK) return err;
 
-    std::string openCmd = "f=open(" + pyQuote(path) + ",'rb')\nr=f.read";
+    // Abrir archivo y obtener closure de lectura
+    std::string openCmd = "f=open(" + pyQuote(path) + ",'rb')\n"
+                          "r=f.read";
     err = exec(openCmd);
     if (err != ErrorCode::OK) return err;
 
-    size_t chunkSizeVal = static_cast<size_t>(chunkSize);
-    std::string output;
+    const size_t chunkSizeVal = static_cast<size_t>(chunkSize);
 
-    while (true) {
+    for (;;) {
+        // Imprime banderas claras para distinguir de cualquier eco del REPL
         std::string readCmd =
-            "try:\n import ubinascii as binascii\n"
-            "except ImportError:\n import binascii as binascii\n"
-            "print(binascii.b2a_base64(r(" + std::to_string(chunkSizeVal) + ")).decode().strip())";
+            "try:\n"
+            " import ubinascii as b\n"
+            "except ImportError:\n"
+            " import binascii as b\n"
+            "x=r(" + std::to_string(chunkSizeVal) + ")\n"
+            "print('@@RF', 0) if (x is None) else print('@@RF', 1)\n"
+            "print('@@DATA', b.b2a_base64(x).decode().strip()) if x else None";
 
-        err = exec(readCmd, output);
-        if (err != ErrorCode::OK) break;
+        std::string out;
+        err = exec(readCmd, out);
+        if (err != ErrorCode::OK) { break; }
 
-        if (output.empty() || output == "None") break;
+        // Normalizar y recorrer líneas
+        stripCR(out);
+        std::istringstream is(out);
+        std::string line;
+        int haveData = -1;     // -1: no visto, 0: EOF, 1: hay datos
+        std::string b64;
 
-        std::vector<uint8_t> chunk = base64Decode(output);
-        if (!chunk.empty())
-            content.insert(content.end(), chunk.begin(), chunk.end());
+        while (std::getline(is, line)) {
+            if (!line.empty() && line.back()=='\r') line.pop_back();
 
-        if (chunk.size() < chunkSizeVal) break;
+            if (line.rfind("@@RF ", 0) == 0) {
+                int flag = 0;
+                (void)std::sscanf(line.c_str(), "@@RF %d", &flag);
+                haveData = flag; // 0 => None/EOF, 1 => hay chunk
+            } else if (line.rfind("@@DATA ", 0) == 0) {
+                b64 = line.substr(7); // después de "@@DATA "
+            }
+        }
+
+        if (haveData == 0) { // EOF limpio
+            break;
+        }
+        if (haveData == 1) {
+            // Solo decodificamos la parte marcada como DATA
+            std::vector<uint8_t> chunk = base64Decode(b64);
+            if (!chunk.empty()) {
+                content.insert(content.end(), chunk.begin(), chunk.end());
+            }
+            // Si el chunk vino más pequeño, ya terminamos
+            if (chunk.size() < chunkSizeVal) break;
+        } else {
+            // No vimos bandera; probablemente ruido/eco: trata como error
+            setError("REPL noise: missing @@RF/@@DATA in output");
+            exec("f.close()");
+            return ErrorCode::EXEC_ERROR;
+        }
     }
 
     exec("f.close()");
@@ -841,22 +931,65 @@ ErrorCode PyBoardUART::exists(const std::string &path, bool &result) {
 }
 
 ErrorCode PyBoardUART::getFileInfo(const std::string &path, FileInfo &info) {
-    std::string cmd = "import os\ns=os.stat(" + pyQuote(path) + ")\nprint(s[0],s[6])";
-    std::string output;
+    // 1) imprimir solo una línea con sentinela fácil de detectar
+    std::string cmd =
+        "import os\n"
+        "try:\n"
+        "  s=os.stat(" + pyQuote(path) + ")\n"
+        "  print('@@FI', s[0], s[6])\n"
+        "except Exception as e:\n"
+        "  print('@@FIERR', repr(e))\n";
 
+    std::string output;
     ErrorCode err = exec(cmd, output);
     if (err != ErrorCode::OK) return err;
 
-    int mode=0, size=0;
-    if (std::sscanf(output.c_str(), "%d %d", &mode, &size) == 2) {
-        info.name = path;
-        info.isDirectory = (mode & 0x4000) != 0;
-        info.size = static_cast<size_t>(size);
-        return ErrorCode::OK;
+    // 2) buscar la línea que empiece con @@FI
+    int mode = 0;
+    unsigned long long size = 0ULL;
+    {
+        std::istringstream is(output);
+        std::string line;
+        bool got = false;
+        while (std::getline(is, line)) {
+            // quita \r residuales
+            if (!line.empty() && line.back() == '\r') line.pop_back();
+
+            if (line.rfind("@@FIERR", 0) == 0) {
+                setError("os.stat failed: " + line);
+                return ErrorCode::EXEC_ERROR;
+            }
+            if (line.rfind("@@FI", 0) == 0) {
+                // formato: @@FI <mode> <size>
+                // ojo: %d %llu para 32/64 bits; en ESP-IDF unsigned long long es seguro
+                if (std::sscanf(line.c_str(), "@@FI %d %llu", &mode, &size) == 2) {
+                    got = true;
+                    break;
+                }
+            }
+        }
+        if (!got) {
+            // Como fallback, intenta detectar una línea con "solo números"
+            is.clear(); is.seekg(0);
+            while (std::getline(is, line)) {
+                if (!line.empty() && line.back() == '\r') line.pop_back();
+                // ej: "33261 1024"
+                int m=0; unsigned long long sz=0;
+                if (std::sscanf(line.c_str(), "%d %llu", &m, &sz) == 2) {
+                    mode = m; size = sz; got = true; break;
+                }
+            }
+        }
+        if (!got) {
+            setError("Failed to parse file info (echo/noise in output): " + output);
+            return ErrorCode::EXEC_ERROR;
+        }
     }
 
-    setError("Failed to parse file info");
-    return ErrorCode::EXEC_ERROR;
+    info.name = path;
+    info.isDirectory = (mode & 0x4000) != 0;
+    info.size = static_cast<size_t>(size);
+    return ErrorCode::OK;
 }
 
 // ============================================================================

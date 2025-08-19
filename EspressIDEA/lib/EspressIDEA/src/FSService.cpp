@@ -429,37 +429,45 @@ esp_err_t FSService::downloadHandler(httpd_req_t* req) {
 
 esp_err_t FSService::uploadHandler(httpd_req_t* req) {
   auto* inst = FSService::self(); if (!inst) return ESP_FAIL;
+
   std::string path;
   if (!inst->queryParam(req, "path", path) || path.empty()) {
     httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "missing path");
     return ESP_OK;
   }
 
-  const int total = req->content_len;
-  if (total <= 0 || (size_t)total > MAX_UPLOAD) {
+  int appendInt = 0;
+  (void) inst->queryParamInt(req, "append", appendInt);
+  bool append = appendInt != 0;
+
+  int remaining = req->content_len;
+  if (remaining <= 0) {
     httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "invalid body size");
     return ESP_OK;
   }
 
-  std::vector<uint8_t> body;
-  body.resize(total);
-  int received = 0;
-  while (received < total) {
-    int r = httpd_req_recv(req, reinterpret_cast<char*>(body.data()) + received, total - received);
+  ReplControl::ScopedReplLock lock(inst->repl_, "fs.upload");
+
+  const size_t CH = 8 * 1024; // trozo de lectura del HTTP
+  std::vector<uint8_t> buf(CH);
+
+  while (remaining > 0) {
+    int toRead = std::min<int>(remaining, (int)CH);
+    int r = httpd_req_recv(req, reinterpret_cast<char*>(buf.data()), toRead);
     if (r <= 0) {
       httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "recv error");
       return ESP_OK;
     }
-    received += r;
+
+    auto rc = inst->board_.writeFileChunk(path, buf.data(), (size_t)r, append);
+    if (rc != PyBoard::ErrorCode::OK) {
+      inst->sendJSON(req, std::string("{\"ok\":false,\"error\":\"")+esc(inst->board_.getLastError())+"\"}");
+      return ESP_OK;
+    }
+    remaining -= r;
+    append = true; // el resto siempre en append
   }
 
-  ReplControl::ScopedReplLock lock(inst->repl_, "fs.upload");
-
-  auto rc = inst->board_.writeFileRaw(path, body);
-  if (rc != PyBoard::ErrorCode::OK) {
-    inst->sendJSON(req, std::string("{\"ok\":false,\"error\":\"")+esc(inst->board_.getLastError())+"\"}");
-    return ESP_OK;
-  }
   inst->sendJSON(req, std::string("{\"ok\":true,\"path\":\"")+esc(path)+"\"}");
   return ESP_OK;
 }
