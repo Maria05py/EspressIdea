@@ -8,7 +8,7 @@ import os
 app = Flask(__name__)
 
 # Configura tu API Key de Gemini
-client = genai.Client(api_key="AIzaSyANMCE5_ftUnX_lE3opUFkh9Mp2aD8XGCs")  
+client = genai.Client(api_key="TU_API_KEY")  
 
 # Prompts maestros para cada placa
 prompts_placas = {
