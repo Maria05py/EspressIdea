@@ -356,3 +356,48 @@ body {
   margin-bottom: 8px;
 }
 
+
+/* Indicador "escribiendo..." */
+.typing-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 2px;
+  border-radius: 50%;
+  background: #cfcfcf;
+  opacity: 0.4;
+  animation: typingBlink 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: .2s; }
+.typing-dot:nth-child(3) { animation-delay: .4s; }
+
+@keyframes typingBlink {
+  0% { opacity: 0.2; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-2px); }
+  60% { opacity: 0.2; transform: translateY(0); }
+  100% { opacity: 0.2; transform: translateY(0); }
+}
+
+/* Ajuste de pre dentro de burbuja para código */
+.chat-bubble pre {
+  background: #0f0f0f;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 10px;
+  overflow-x: auto;
+}
+
+/* Botoncitos dentro del chat */
+.btn-mini{
+  border: 1px solid #444; background:#2d2d2d; color:#ddd;
+  font-size: 12px; padding: 4px 8px; border-radius: 6px; cursor: pointer;
+}
+.btn-mini:hover{ background:#3a3a3a; }
+.btn-mini.primary{ border-color:#4e8cff; color:#fff; background:#4e8cff; }
+.btn-mini.primary:hover{ background:#6ea6ff; }
+
+/* Bloques de código del chat */
+.chat-code{
+  margin: 0; padding: 10px; overflow:auto; max-height: 260px;
+  background:#131313; border:1px solid #333; border-radius: 8px;
+}
