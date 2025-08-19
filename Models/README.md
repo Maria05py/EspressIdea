@@ -104,7 +104,8 @@ $response.explicacion
 $response.codigo
 ```
 
-### Con Gemini
+### Con Ollama
+```powershell
 $body = @{
     mensaje = "Mover un servo conectado al pin 5"
     placa   = "ideaboard"
@@ -119,4 +120,5 @@ $response = Invoke-RestMethod `
 
 $response.explicacion
 $response.codigo
+```
 
