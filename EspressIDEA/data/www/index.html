@@ -1,49 +1,185 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EspressIdea</title>
-    <link rel="stylesheet" href="css/Index.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EspressIdea</title>
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <!-- FontAwesome (opcional) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <!-- Estilos -->
+  <link rel="stylesheet" href="/Estilos/test.css" />
+  <!-- Tu orquestador -->
+  <script type="module" src="/JavaScript/index.js"></script>
+
+  <style>
+    /* Unos estilos mínimos para el menú contextual */
+    .ctx-menu{
+      position: fixed; z-index: 10000; min-width: 180px;
+      background: #1e1e1e; border: 1px solid #333; border-radius: 6px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.35); padding: 6px 0; display:none;
+      color:#eee; font-size: 14px;
+    }
+    .ctx-menu .item{ padding: 8px 12px; cursor: pointer; display:flex; align-items:center; gap:8px; }
+    .ctx-menu .item:hover{ background:#2a2a2a; }
+    .ctx-menu .sep{ height:1px; background:#333; margin:6px 0; }
+    .sidebar .toolbar{
+      display:flex; gap:8px; padding:8px; border-bottom:1px solid #2a2a2a; align-items:center;
+    }
+    .sidebar .toolbar .btn{
+      font-size:12px; padding:4px 8px; border-radius:6px; background:#2a2a2a; color:#ddd; border:1px solid #383838; cursor:pointer;
+    }
+    .sidebar .toolbar .btn:hover{ background:#343434; }
+    .file-tree li.selected{ background:#2a2a2a; }
+  </style>
 </head>
 <body>
-    <header class="navbar">
-        <img src="imagenes/image.png" alt="Logo" class="logo">
-        <span class="brand">EspressIdea</span>
-    </header>
+  <div class="app">
+    <header class="logo">LOGO EspressIdea</header>
 
-    <main class="container">
-        <div class="ai-output">
-            <p><strong>Editor de codigo</strong></p>
+    <div class="main-container">
+      <!-- Sidebar Archivos -->
+      <aside class="sidebar">
+        <div class="device-title">Dispositivo Python</div>
+        <div class="toolbar">
+          <button class="btn" id="btnRefresh"><i class="bi bi-arrow-clockwise"></i></button>
+          <button class="btn" id="btnNewFolder"><i class="bi bi-folder-plus"></i></button>
+          <button class="btn" id="btnRename"><i class="bi bi-input-cursor-text"></i></button>
+          <button class="btn" id="btnDelete"><i class="bi bi-trash3"></i></button>
+          <button class="btn" id="btnInfo"><i class="bi bi-info-circle"></i></button>
+        </div>
+        <ul class="file-tree" id="fileTree"></ul>
+      </aside>
+
+      <!-- Área principal -->
+      <main class="code-area">
+        <div class="tabs">
+          <div class="tab active" id="activeTab">sin nombre</div>
+          <div class="tab" style="display:none"><span class="close-tab">x</span></div>
         </div>
 
-        <div class="control-panel">
-            <div class="buttons">
-                <button class="btn">Iniciar Codigo</button>
-                <button class="btn">Detener Codigo</button>
-                <button class="btn">Reiniciar</button>
-            </div>
-            <div class="conversation">
-                <p><strong>Prompts y respuestas</strong></p>
-                <input type="text" class="input-box" placeholder="Type here...">
-            </div>
+        <div class="controls">
+          <button class="btn play" title="Ejecutar code.py"><i class="bi bi-play-fill"></i></button>
+          <button class="btn stop" id="btnStop" title="Detener y preparar REPL"><i class="bi bi-stop-fill"></i></button>
+          <button class="btn save" id="btnSave" title="Guardar archivo activo"><i class="bi bi-save"></i></button>
+          <button class="btn download" id="btnDownload" title="Descargar archivo activo"><i class="bi bi-download"></i></button>
+          <button class="btn upload" id="btnUpload" title="Subir archivo a carpeta actual"><i class="bi bi-upload"></i></button>
+          <button class="tag green">HOST</button>
+          <button class="tag red">IA</button>
+          <button class="tag green">Dispositivo python</button>
         </div>
-    </main>
 
-    <footer class="footer">
-    <div class="social-icons">
-        <a href="https://github.com" target="_blank" aria-label="GitHub">
-            <i class="fab fa-github"></i>
-        </a>
-        <a href="https://youtube.com" target="_blank" aria-label="YouTube">
-            <i class="fab fa-youtube"></i>
-        </a>
+        <div class="editor-window">
+          <textarea id="codeEditor" spellcheck="false" placeholder="# Selecciona un archivo para editarlo"></textarea>
+        </div>
+
+        <!-- Consola (Terminal la maneja tu index.js) -->
+        <div class="console">
+          <div class="console-header">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="title">REPL CircuitPython</span>
+            <span id="wsStatus" class="status badge">Conectando...</span>
+          </div>
+          <div id="terminal" class="console-terminal" contenteditable="true" spellcheck="false"></div>
+        </div>
+      </main>
+
+      <!-- Panel derecho (chat) -->
+      <aside class="right-panel">
+        <div id="chatMessages" class="chat-container"></div>
+        <div class="input-area">
+          <input type="text" id="chatInput" placeholder="Escribe un mensaje..." />
+          <button id="sendBtn">Enviar</button>
+        </div>
+      </aside>
     </div>
-    <span>© EspressIdea</span>
+  </div>
 
-    <script src="js/script.js"></script>
-</footer>
+  <!-- Bloque de prueba: ejecutar el contenido del editor activo -->
+  <script>
+  (function(){
+    function parseJSON(res){
+      return res.text().then(txt=>{
+        try { return JSON.parse(txt); }
+        catch { throw new Error('Respuesta no JSON: ' + txt.slice(0,120)); }
+      });
+    }
 
+    async function execActiveEditor(){
+      const ta = document.getElementById('codeEditor');
+      const status = document.getElementById('wsStatus');
+      const btn = document.querySelector('.btn.play');
+      const term = document.getElementById('terminal');
+
+      const code = ta ? ta.value : '';
+      if (!code.trim()){
+        alert('El editor está vacío.');
+        return;
+      }
+
+      if (btn) btn.disabled = true;
+      if (status){
+        status.classList.remove('success','danger');
+        status.classList.add('warn');
+        status.textContent = 'Ejecutando...';
+      }
+
+      try{
+        const resp = await fetch('/api/exec', {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: code
+        });
+        const j = await parseJSON(resp);
+
+        if (!j.ok) throw new Error(j.stderr || 'Fallo /api/exec');
+
+        // Mostrar salida en la consola visual
+        if (term){
+          const hdr = document.createElement('div');
+          hdr.style.opacity = '0.8';
+          hdr.style.margin = '6px 0';
+          hdr.textContent = '⮕ Salida de ejecución';
+          const pre = document.createElement('pre');
+          pre.textContent = j.stdout || '';
+          term.appendChild(hdr);
+          term.appendChild(pre);
+          term.scrollTop = term.scrollHeight;
+        } else {
+          alert(j.stdout || 'Ejecutado sin salida.');
+        }
+
+        if (status){
+          status.classList.remove('warn');
+          status.classList.add('success');
+          status.textContent = 'Ejecutado';
+        }
+      } catch(e){
+        console.error(e);
+        if (status){
+          status.classList.remove('warn');
+          status.classList.add('danger');
+          status.textContent = 'Error';
+        }
+        alert('Error al ejecutar: ' + e.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    // Exponer por si quieres llamarlo desde consola
+    window.execActiveEditor = execActiveEditor;
+
+    // Click al botón ▶️
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const runBtn = document.querySelector('.btn.play');
+      if (runBtn) runBtn.addEventListener('click', execActiveEditor);
+    });
+  })();
+  </script>
 </body>
 </html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EspressIdea</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="/Estilos/test.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="logo">LOGO EspressIdea</header>
+
+    <div class="main-container">
+      
+      <aside class="sidebar">
+        <div class="device-title">Dispositivo Python</div>
+        <ul class="file-tree">
+          <li><i class="fas fa-folder"></i> lib</li>
+          <li><i class="fas fa-file-code"></i> adafruit_motor</li>
+          <li><i class="fas fa-file-code"></i> ideaboard.py</li>
+          <li><i class="fas fa-file-code"></i> nombre_muy_lar...</li>
+          <li><i class="fas fa-folder"></i> examples</li>
+          <li><i class="fas fa-file-code"></i> code.py</li>
+          <li class="selected">
+            <i class="fas fa-file-alt"></i> settings.toml
+            <i class="fas fa-ellipsis-v context-menu"></i>
+          </li>
+        </ul>
+      </aside>
+
+      <main class="code-area">
+        <div class="tabs">
+          <div class="tab active">foo.py</div>
+          <div class="tab">bar.py <span class="close-tab">×</span></div>
+        </div>
+
+        <div class="controls">
+          <button class="btn play"><i class="fas fa-play"></i></button>
+          <button class="btn stop"><i class="fas fa-stop"></i></button>
+          <button class="btn save"><i class="fas fa-save"></i></button>
+          <button class="btn upload"><i class="fas fa-upload"></i></button>
+          <button class="btn image"><i class="fas fa-image"></i></button>
+          <button class="tag green">HOST</button>
+          <button class="tag red">IA</button>
+          <button class="tag green">Dispositivo python</button>
+        </div>
+
+        <div class="editor-window">
+          <textarea id="codeEditor" spellcheck="false">
+// utils.py
+
+import random
+import time
+
+def generar_usuario():
+    nombres = ["Ana", "Luis", "Carlos", "Sofía", "Elena"]
+    return {
+        "id": random.randint(1000, 9999),
+        "nombre": random.choice(nombres),
+        "activo": random.choice([True, False]),
+        "registro": time.strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+def imprimir_usuarios(lista):
+    for usuario in lista:
+        estado = "Activo" if usuario["activo"] else "Inactivo"
+        print(f'{usuario["nombre"]} ({usuario["id"]}) - {estado}')
+
+if __name__ == "__main__":
+    usuarios = [generar_usuario() for _ in range(5)]
+    imprimir_usuarios(usuarios)
+          </textarea>
+        </div>
+
+        <div class="console">
+          <p>0;2;Wi-Fi off | REPL | 9.2.4</p>
+          <p>Adafruit CircuitPython 9.2.4 on 2025-01-29; CRiobernetica IdeaBoard with ESP32</p>
+          <p>&gt;&gt;&gt; print("hola mundo")</p>
+        </div>
+      </main>
+
+      <aside class="right-panel">
+        <div id="chatMessages" class="chat-container">
+        </div>
+        <div class="input-area">
+          <input type="text" id="chatInput" placeholder="Escribe un mensaje..." />
+          <button id="sendBtn">Enviar</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="/JavaScript/test.js"></script>
+  
+</body>
+</html>
