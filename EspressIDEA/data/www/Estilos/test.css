@@ -322,3 +322,37 @@ body {
 .input-area button:hover {
   background: #6ea6ff;
 }
+
+/* ====== Menú contextual (mínimo) ====== */
+.ctx-menu{
+  position: fixed;
+  z-index: 10000;
+  min-width: 180px;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+  padding: 6px 0;
+  display: none;
+  color: #eee;
+  font-size: 14px;
+}
+.ctx-menu .item{
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ctx-menu .item:hover{ background: #2a2a2a; }
+.ctx-menu .sep{ height: 1px; background: #333; margin: 6px 0; }
+
+/* ====== Barra de herramientas de la sidebar (mínimo) ====== */
+.sidebar .toolbar{
+  display: flex;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #444;
+  margin-bottom: 8px;
+}
+

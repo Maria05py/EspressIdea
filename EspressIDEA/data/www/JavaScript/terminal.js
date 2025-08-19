@@ -1,4 +1,4 @@
-// terminal-ws.js
+// terminal.js
 // Módulo ES que expone initTerminalWS(options)
 // options: { terminalSelector, statusSelector, wsPath }
 //

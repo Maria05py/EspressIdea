@@ -114,7 +114,6 @@ namespace PyBoard
         ErrorCode follow(std::string &output, std::string &error, uint32_t timeoutMs);
         ErrorCode rawPasteWrite(const std::string &data);
 
-
     public:
         // Constructor and destructor
         PyBoardUART(uart_port_t uart = UART_NUM_2,
@@ -145,6 +144,8 @@ namespace PyBoard
         ErrorCode interrupt();
 
         bool isInRawRepl() const { return inRawRepl; }
+        ErrorCode syncReplCircuitPython(uint32_t timeoutMs);
+        ErrorCode waitForReplPrompt(uint32_t timeoutMs);
 
         // --- Escritura cruda por UART (API pública) ---
         /** Escribe bytes crudos al puerto UART. No agrega terminadores. */
@@ -159,6 +160,8 @@ namespace PyBoard
         ErrorCode exec(const std::string &command, std::string &output, uint32_t timeoutMs = 0);
         ErrorCode exec(const std::string &command); // No output version
         ErrorCode eval(const std::string &expression, std::string &result, uint32_t timeoutMs = 0);
+        ErrorCode execPaste(const std::string &code, std::string &output, uint32_t timeoutMs = 0);
+        ErrorCode execFriendly(const std::string& command, std::string& output, uint32_t timeoutMs = 0);
 
         // File system operations with Base64 encoding
         ErrorCode listDir(const std::string &path, std::vector<FileInfo> &files);

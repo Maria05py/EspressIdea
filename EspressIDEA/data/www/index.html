@@ -4,92 +4,92 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>EspressIdea</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="/Estilos/test.css" />
 
-   <!-- Carga del módulo de arranque -->
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <!-- FontAwesome (opcional) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <!-- Estilos -->
+  <link rel="stylesheet" href="/Estilos/test.css" />
   <script type="module" src="/JavaScript/index.js"></script>
+
+  <style>
+    /* Unos estilos mínimos para el menú contextual */
+    .ctx-menu{
+      position: fixed; z-index: 10000; min-width: 180px;
+      background: #1e1e1e; border: 1px solid #333; border-radius: 6px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.35); padding: 6px 0; display:none;
+      color:#eee; font-size: 14px;
+    }
+    .ctx-menu .item{
+      padding: 8px 12px; cursor: pointer; display:flex; align-items:center; gap:8px;
+    }
+    .ctx-menu .item:hover{ background:#2a2a2a; }
+    .ctx-menu .sep{ height:1px; background:#333; margin:6px 0; }
+    .sidebar .toolbar{
+      display:flex; gap:8px; padding:8px; border-bottom:1px solid #2a2a2a; align-items:center;
+    }
+    .sidebar .toolbar .btn{
+      font-size:12px; padding:4px 8px; border-radius:6px; background:#2a2a2a; color:#ddd; border:1px solid #383838; cursor:pointer;
+    }
+    .sidebar .toolbar .btn:hover{ background:#343434; }
+    .file-tree li.selected{ background:#2a2a2a; }
+  </style>
 </head>
 <body>
   <div class="app">
     <header class="logo">LOGO EspressIdea</header>
 
     <div class="main-container">
+      <!-- Sidebar Archivos -->
       <aside class="sidebar">
         <div class="device-title">Dispositivo Python</div>
-        <ul class="file-tree">
-          <li><i class="fas fa-folder"></i> lib</li>
-          <li><i class="fas fa-file-code"></i> adafruit_motor</li>
-          <li><i class="fas fa-file-code"></i> ideaboard.py</li>
-          <li><i class="fas fa-file-code"></i> nombre_muy_lar...</li>
-          <li><i class="fas fa-folder"></i> examples</li>
-          <li><i class="fas fa-file-code"></i> code.py</li>
-          <li class="selected">
-            <i class="fas fa-file-alt"></i> settings.toml
-            <i class="fas fa-ellipsis-v context-menu"></i>
-          </li>
-        </ul>
+        <div class="toolbar">
+          <button class="btn" id="btnRefresh"><i class="bi bi-arrow-clockwise"></i></button>
+          <button class="btn" id="btnNewFolder"><i class="bi bi-folder-plus"></i></button>
+          <button class="btn" id="btnRename"><i class="bi bi-input-cursor-text"></i></button>
+          <button class="btn" id="btnDelete"><i class="bi bi-trash3"></i></button>
+          <button class="btn" id="btnInfo"><i class="bi bi-info-circle"></i></button>
+        </div>
+        <ul class="file-tree" id="fileTree"></ul>
       </aside>
 
+      <!-- Área principal -->
       <main class="code-area">
         <div class="tabs">
-          <div class="tab active">foo.py</div>
-          <div class="tab">bar.py <span class="close-tab">x</span></div>
+          <div class="tab active" id="activeTab">sin nombre</div>
+          <div class="tab" style="display:none"><span class="close-tab">x</span></div>
         </div>
 
         <div class="controls">
-          <button class="btn play"><i class="fas fa-play"></i></button>
-          <button class="btn stop"><i class="fas fa-stop"></i></button>
-          <button class="btn save"><i class="fas fa-save"></i></button>
-          <button class="btn upload"><i class="fas fa-upload"></i></button>
-          <button class="btn image"><i class="fas fa-image"></i></button>
+          <button class="btn play" title="Ejecutar code.py"><i class="bi bi-play-fill"></i></button>
+          <button class="btn stop" id="btnStop" title="Detener y preparar REPL"><i class="bi bi-stop-fill"></i></button>
+          <button class="btn save" id="btnSave" title="Guardar archivo activo"><i class="bi bi-save"></i></button>
+          <button class="btn download" id="btnDownload" title="Descargar archivo activo"><i class="bi bi-download"></i></button>
+          <button class="btn upload" id="btnUpload" title="Subir archivo a carpeta actual"><i class="bi bi-upload"></i></button>
           <button class="tag green">HOST</button>
           <button class="tag red">IA</button>
           <button class="tag green">Dispositivo python</button>
         </div>
 
         <div class="editor-window">
-          <textarea id="codeEditor" spellcheck="false">
-// utils.py
-
-import random
-import time
-
-def generar_usuario():
-    nombres = ["Ana", "Luis", "Carlos", "Sofía", "Elena"]
-    return {
-        "id": random.randint(1000, 9999),
-        "nombre": random.choice(nombres),
-        "activo": random.choice([True, False]),
-        "registro": time.strftime("%Y-%m-%d %H:%M:%S")
-    }
-
-def imprimir_usuarios(lista):
-    for usuario in lista:
-        estado = "Activo" if usuario["activo"] else "Inactivo"
-        print(f'{usuario["nombre"]} ({usuario["id"]}) - {estado}')
-
-if __name__ == "__main__":
-    usuarios = [generar_usuario() for _ in range(5)]
-    imprimir_usuarios(usuarios)
-          </textarea>
+          <textarea id="codeEditor" spellcheck="false" placeholder="# Selecciona un archivo para editarlo"></textarea>
         </div>
 
-        <!-- Consola tipo terminal (entrada/salida en un solo flujo) -->
+        <!-- Consola (Terminal la maneja tu index.js) -->
         <div class="console">
           <div class="console-header">
             <span class="dot red"></span>
             <span class="dot yellow"></span>
             <span class="dot green"></span>
             <span class="title">REPL CircuitPython</span>
-            <span id="wsStatus" class="status badge">Conectando…</span>
+            <span id="wsStatus" class="status badge">Conectando...</span>
           </div>
-
-          <!-- Único área editable que actúa como terminal -->
           <div id="terminal" class="console-terminal" contenteditable="true" spellcheck="false"></div>
         </div>
       </main>
 
+      <!-- Panel derecho (chat) -->
       <aside class="right-panel">
         <div id="chatMessages" class="chat-container"></div>
         <div class="input-area">
@@ -99,5 +99,480 @@ if __name__ == "__main__":
       </aside>
     </div>
   </div>
+
+  <!-- ========== JS para Filesystem (inline) ========== -->
+  <script>
+  (function(){
+    // Helpers DOM / utils
+    var $  = function(sel, root){ return (root||document).querySelector(sel); };
+    var $$ = function(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); };
+
+    function base64Encode(str){ return btoa(unescape(encodeURIComponent(str))); }
+    function base64Decode(b64){ return decodeURIComponent(escape(atob(b64))); }
+
+    function fetchJSON(url, init){
+      return fetch(url, init || {}).then(function(res){
+        return res.text().then(function(txt){
+          var data = null;
+          try { data = JSON.parse(txt); } catch(e) {}
+          if (!res.ok) {
+            var msg = (data && data.error) ? data.error : ("HTTP " + res.status);
+            throw new Error(msg);
+          }
+          return data !== null ? data : txt;
+        });
+      });
+    }
+
+    function joinPath(dir, name){
+      if (!dir || dir === "/") return "/" + String(name).replace(/^\/+/, "");
+      return dir.replace(/\/+$/, "") + "/" + String(name).replace(/^\/+/, "");
+    }
+    function escapeHTML(s){
+      return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    }
+
+    // ===== Estado =====
+    var state = {
+      cwd: "/",
+      openFile: null,
+      selected: null // { path, name, dir(bool) }
+    };
+
+    // ===== Elementos =====
+    var els = {
+      tree:        $("#fileTree"),
+      editor:      $("#codeEditor"),
+      tab:         $("#activeTab"),
+      btnStop:     $("#btnStop"),
+      btnSave:     $("#btnSave"),
+      btnDownload: $("#btnDownload"),
+      btnUpload:   $("#btnUpload"),
+      btnRefresh:  $("#btnRefresh"),
+      btnNewFolder:$("#btnNewFolder"),
+      btnRename:   $("#btnRename"),
+      btnDelete:   $("#btnDelete"),
+      btnInfo:     $("#btnInfo")
+    };
+    if (!els.tree || !els.editor || !els.tab) {
+      console.warn("[FS] Elementos base no presentes; omitiendo init FS.");
+      return;
+    }
+
+    // ===== ensure_idle =====
+    var lastEnsure = 0;
+    function ensureIdle(){
+      var now = Date.now();
+      if (now - lastEnsure < 250) return Promise.resolve();
+      lastEnsure = now;
+      return fetchJSON("/api/repl/ensure_idle", { method:"POST" }).then(function(j){
+        if (j && j.ok === false) throw new Error(j.error || "ensure_idle failed");
+      });
+    }
+
+    // ===== Render árbol y selección =====
+    function renderTree(files){
+      els.tree.innerHTML = "";
+
+      if (state.cwd !== "/") {
+        var liUp = document.createElement("li");
+        liUp.className = "up-item";
+        liUp.innerHTML = '<i class="bi bi-arrow-90deg-up"></i> ..';
+        liUp.addEventListener("click", function(){
+          ensureIdle()
+          .then(function(){
+            var parent = state.cwd.replace(/\/+$/, "").split("/").slice(0, -1).join("/") || "/";
+            return listDir(parent);
+          })
+          .catch(function(e){ alert(e.message); });
+        });
+        els.tree.appendChild(liUp);
+      }
+
+      files.sort(function(a,b){ return (b.dir - a.dir) || a.name.localeCompare(b.name, "es"); });
+
+      files.forEach(function(f){
+        var li = document.createElement("li");
+        li.className = "file-item";
+        li.dataset.name = f.name;
+        li.dataset.dir  = f.dir ? "1" : "0";
+        li.title = f.dir ? "Carpeta" : "Archivo";
+
+        // icono + nombre
+        li.innerHTML = (f.dir ? '<i class="bi bi-folder"></i> ' : '<i class="bi bi-file-earmark-code"></i> ')
+                       + escapeHTML(f.name);
+
+        // click izquierdo: abrir dir o abrir archivo en editor
+        li.addEventListener("click", function(e){
+          // si es dir => navegar
+          if (f.dir) {
+            ensureIdle()
+              .then(function(){ return listDir(joinPath(state.cwd, f.name)); })
+              .catch(function(e){ alert(e.message); });
+            return;
+          }
+          // archivo => abrir en editor
+          openFile(joinPath(state.cwd, f.name));
+        });
+
+        // click medio/CTRL-click => seleccionar sin abrir
+        li.addEventListener("auxclick", function(e){
+          if (e.button === 1) {
+            selectItem(f.name, !!f.dir);
+          }
+        });
+        // Context menu
+        li.addEventListener("contextmenu", function(e){
+          e.preventDefault();
+          selectItem(f.name, !!f.dir);
+          openContextMenu(e.clientX, e.clientY, {
+            name: f.name, dir: !!f.dir, path: joinPath(state.cwd, f.name)
+          });
+        });
+
+        els.tree.appendChild(li);
+      });
+
+      // Si hay selección previa en este directorio, re-marcar
+      if (state.selected && state.selected.path.startsWith(state.cwd + "/")) {
+        highlightSelected();
+      }
+    }
+
+    function selectItem(name, isDir){
+      var path = joinPath(state.cwd, name);
+      state.selected = { name:name, dir: !!isDir, path:path };
+      highlightSelected();
+    }
+    function clearSelection(){
+      state.selected = null;
+      highlightSelected();
+    }
+    function highlightSelected(){
+      $$(".file-tree li").forEach(function(li){ li.classList.remove("selected"); });
+      if (!state.selected) return;
+      // intenta encontrar item exacto
+      var match = $$(".file-tree li").find(function(li){
+        return (li.dataset && li.dataset.name === state.selected.name);
+      });
+      if (match) match.classList.add("selected");
+    }
+
+    function markSelectedFileOpen(path){
+      var name = path.split("/").pop();
+      state.selected = { name:name, dir:false, path:path };
+      highlightSelected();
+    }
+
+    // ===== Operaciones de FS =====
+    function listDir(path){
+      return fetchJSON("/api/fs/list?path=" + encodeURIComponent(path)).then(function(j){
+        if (!j.ok) throw new Error(j.error || "list failed");
+        state.cwd = j.path || path;
+        clearSelection();
+        renderTree(j.files || []);
+      });
+    }
+
+    function openFile(path){
+      return ensureIdle()
+      .then(function(){
+        return fetchJSON("/api/fs/read?path=" + encodeURIComponent(path));
+      })
+      .then(function(j){
+        if (!j.ok) throw new Error(j.error || "read failed");
+        var text = base64Decode(j.base64 || "");
+        els.editor.value = text;
+        state.openFile = path;
+        els.tab.textContent = path.split("/").pop() || path;
+        markSelectedFileOpen(path);
+      })
+      .catch(function(e){ alert(e.message); });
+    }
+
+    function saveActiveFile(){
+      if (!state.openFile) { alert("No hay archivo activo."); return Promise.resolve(); }
+      var b64 = base64Encode(els.editor.value);
+      return ensureIdle()
+      .then(function(){
+        return fetchJSON("/api/fs/write?path=" + encodeURIComponent(state.openFile), {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: b64
+        });
+      })
+      .then(function(res){
+        if (!res.ok) throw new Error(res.error || "save failed");
+        return listDir(state.cwd).catch(function(){});
+      })
+      .then(function(){ alert("Archivo guardado ✅"); })
+      .catch(function(err){ alert(err.message); });
+    }
+
+    function downloadActiveFile(){
+      if (!state.openFile) { alert("No hay archivo activo."); return; }
+      ensureIdle()
+      .then(function(){
+        var url = "/api/fs/download?path=" + encodeURIComponent(state.openFile);
+        window.open(url, "_blank");
+      })
+      .catch(function(e){ alert(e.message); });
+    }
+
+    function uploadToCwd(){
+      var inp = document.createElement("input");
+      inp.type = "file";
+      inp.onchange = function(){
+        var f = inp.files && inp.files[0];
+        if (!f) return;
+
+        ensureIdle()
+        .then(function(){ return f.arrayBuffer(); })
+        .then(function(buf){
+          var path = joinPath(state.cwd, f.name);
+          return fetchJSON("/api/fs/upload?path=" + encodeURIComponent(path), {
+            method: "POST",
+            headers: { "Content-Type": "application/octet-stream" },
+            body: buf
+          });
+        })
+        .then(function(res){
+          if (!res.ok) throw new Error(res.error || "upload failed");
+          return listDir(state.cwd).then(function(){
+            alert("Subido: " + f.name + " ✅");
+          });
+        })
+        .catch(function(e){
+          alert("Error al subir: " + e.message);
+        });
+      };
+      inp.click();
+    }
+
+    // ---- Nuevas: info / exists / mkdir / rename / delete / rmdir ----
+    function apiInfo(path){
+      return ensureIdle()
+      .then(function(){ return fetchJSON("/api/fs/info?path=" + encodeURIComponent(path)); })
+      .then(function(j){ if (!j.ok) throw new Error(j.error || "info failed"); return j.info; });
+    }
+
+    function apiExists(path){
+      return ensureIdle()
+      .then(function(){ return fetchJSON("/api/fs/exists?path=" + encodeURIComponent(path)); })
+      .then(function(j){ if (!j.ok) throw new Error(j.error || "exists failed"); return !!j.exists; });
+    }
+
+    function apiMkdir(path){
+      return ensureIdle()
+      .then(function(){ return fetchJSON("/api/fs/mkdir?path=" + encodeURIComponent(path), { method:"POST" }); })
+      .then(function(j){ if (!j.ok) throw new Error(j.error || "mkdir failed"); });
+    }
+
+    function apiRename(fromPath, toPath){
+      return ensureIdle()
+      .then(function(){
+        var q = "/api/fs/rename?from=" + encodeURIComponent(fromPath) + "&to=" + encodeURIComponent(toPath);
+        return fetchJSON(q, { method:"POST" });
+      })
+      .then(function(j){ if (!j.ok) throw new Error(j.error || "rename failed"); });
+    }
+
+    function apiDeleteFile(path){
+      return ensureIdle()
+      .then(function(){
+        return fetchJSON("/api/fs/delete?path=" + encodeURIComponent(path), { method:"POST" });
+      })
+      .then(function(j){ if (!j.ok) throw new Error(j.error || "delete failed"); });
+    }
+
+    function apiRmdir(path, recursive){
+      return ensureIdle()
+      .then(function(){
+        var url = "/api/fs/rmdir?path=" + encodeURIComponent(path) + (recursive ? "&recursive=1" : "");
+        return fetchJSON(url, { method:"POST" });
+      })
+      .then(function(j){ if (!j.ok) throw new Error(j.error || "rmdir failed"); });
+    }
+
+    // ===== Menú contextual (árbol) =====
+    var ctx = (function(){
+      var div = document.createElement("div");
+      div.className = "ctx-menu";
+      document.body.appendChild(div);
+
+      function hide(){ div.style.display = "none"; }
+      function show(x,y, items){
+        div.innerHTML = "";
+        items.forEach(function(it){
+          if (it === "|") {
+            var s = document.createElement("div"); s.className="sep"; div.appendChild(s); return;
+          }
+          var el = document.createElement("div"); el.className="item";
+          el.innerHTML = (it.icon ? '<i class="'+it.icon+'"></i>' : '') + '<span>'+it.label+'</span>';
+          el.addEventListener("click", function(){ hide(); it.onClick && it.onClick(); });
+          div.appendChild(el);
+        });
+        div.style.display = "block";
+        div.style.left = Math.min(x, window.innerWidth - div.offsetWidth - 4) + "px";
+        div.style.top  = Math.min(y, window.innerHeight - div.offsetHeight - 4) + "px";
+      }
+      window.addEventListener("click", hide);
+      window.addEventListener("scroll", hide, true);
+      return { show:show, hide:hide };
+    })();
+
+    function openContextMenu(x, y, target){
+      // target: {name, dir, path}
+      var isDir = !!target.dir;
+      var items = [];
+
+      if (isDir) {
+        items.push({ icon:"bi bi-folder2-open", label:"Abrir carpeta", onClick:function(){ listDir(target.path); }});
+        items.push({ icon:"bi bi-file-earmark-plus", label:"Nuevo archivo aquí", onClick:function(){
+          var fname = prompt("Nombre de archivo:");
+          if (!fname) return;
+          var full = joinPath(target.path, fname);
+          // crear archivo vacío:
+          ensureIdle()
+            .then(function(){
+              var txt = ""; var b64 = base64Encode(txt);
+              return fetchJSON("/api/fs/write?path=" + encodeURIComponent(full), {
+                method: "POST", headers: { "Content-Type":"text/plain" }, body:b64
+              });
+            })
+            .then(function(j){ if (!j.ok) throw new Error(j.error||"write failed"); return listDir(state.cwd); })
+            .catch(function(e){ alert(e.message); });
+        }});
+        items.push({ icon:"bi bi-folder-plus", label:"Nueva carpeta aquí", onClick:function(){
+          var d = prompt("Nombre de carpeta:");
+          if (!d) return;
+          apiMkdir(joinPath(target.path, d))
+            .then(function(){ return listDir(state.cwd); })
+            .catch(function(e){ alert(e.message); });
+        }});
+        items.push("|");
+      } else {
+        items.push({ icon:"bi bi-journal-code", label:"Abrir archivo", onClick:function(){ openFile(target.path); }});
+      }
+
+      items.push({ icon:"bi bi-info-circle", label:"Info", onClick:function(){
+        apiInfo(target.path)
+          .then(function(info){
+            alert(
+              "Nombre: " + info.name + "\n" +
+              "Tamaño: " + info.size + " bytes\n" +
+              "Directorio: " + (info.dir ? "sí":"no")
+            );
+          })
+          .catch(function(e){ alert(e.message); });
+      }});
+
+      items.push({ icon:"bi bi-input-cursor-text", label:"Renombrar", onClick:function(){
+        var base = target.path.split("/").slice(0,-1).join("/") || "/";
+        var nuevo = prompt("Nuevo nombre:", target.name);
+        if (!nuevo || nuevo === target.name) return;
+        apiRename(target.path, joinPath(base, nuevo))
+          .then(function(){ return listDir(state.cwd); })
+          .catch(function(e){ alert(e.message); });
+      }});
+
+      items.push({ icon:"bi bi-trash3", label:"Eliminar", onClick:function(){
+        if (isDir) {
+          var rec = confirm("¿Eliminar carpeta de forma recursiva?\n(Aceptar = SI, Cancelar = NO)");
+          apiRmdir(target.path, rec)
+            .then(function(){ return listDir(state.cwd); })
+            .catch(function(e){ alert(e.message); });
+        } else {
+          if (!confirm("¿Eliminar archivo '"+ target.name +"'?")) return;
+          apiDeleteFile(target.path)
+            .then(function(){ return listDir(state.cwd); })
+            .catch(function(e){ alert(e.message); });
+        }
+      }});
+
+      ctx.show(x,y, items);
+    }
+
+    // ===== Toolbar acciones =====
+    if (els.btnRefresh)  els.btnRefresh.addEventListener("click", function(){ ensureIdle().then(function(){ listDir(state.cwd); }); });
+    if (els.btnNewFolder)els.btnNewFolder.addEventListener("click", function(){
+      var d = prompt("Nombre de carpeta (en " + state.cwd + "):");
+      if (!d) return;
+      apiMkdir(joinPath(state.cwd, d))
+        .then(function(){ return listDir(state.cwd); })
+        .catch(function(e){ alert(e.message); });
+    });
+    if (els.btnRename)   els.btnRename.addEventListener("click", function(){
+      if (!state.selected){ alert("Selecciona un elemento (clic derecho o clic medio)."); return; }
+      var base = state.selected.path.split("/").slice(0,-1).join("/") || "/";
+      var nuevo = prompt("Nuevo nombre:", state.selected.name);
+      if (!nuevo || nuevo === state.selected.name) return;
+      apiRename(state.selected.path, joinPath(base, nuevo))
+        .then(function(){ return listDir(state.cwd); })
+        .catch(function(e){ alert(e.message); });
+    });
+    if (els.btnDelete)   els.btnDelete.addEventListener("click", function(){
+      if (!state.selected){ alert("Selecciona un elemento (clic derecho o clic medio)."); return; }
+      if (state.selected.dir) {
+        var rec = confirm("¿Eliminar carpeta de forma recursiva?\n(Aceptar = SI, Cancelar = NO)");
+        apiRmdir(state.selected.path, rec)
+          .then(function(){ return listDir(state.cwd); })
+          .catch(function(e){ alert(e.message); });
+      } else {
+        if (!confirm("¿Eliminar archivo '"+ state.selected.name +"'?")) return;
+        apiDeleteFile(state.selected.path)
+          .then(function(){ return listDir(state.cwd); })
+          .catch(function(e){ alert(e.message); });
+      }
+    });
+    if (els.btnInfo)     els.btnInfo.addEventListener("click", function(){
+      if (!state.selected){ alert("Selecciona un elemento (clic derecho o clic medio)."); return; }
+      apiInfo(state.selected.path)
+        .then(function(info){
+          alert(
+            "Nombre: " + info.name + "\n" +
+            "Tamaño: " + info.size + " bytes\n" +
+            "Directorio: " + (info.dir ? "sí":"no")
+          );
+        })
+        .catch(function(e){ alert(e.message); });
+    });
+
+    // Botones editor
+    if (els.btnSave)     els.btnSave.addEventListener("click", function(){ saveActiveFile(); });
+    if (els.btnDownload) els.btnDownload.addEventListener("click", function(){ downloadActiveFile(); });
+    if (els.btnUpload)   els.btnUpload.addEventListener("click", function(){ uploadToCwd(); });
+
+    // Botón Stop: prepara REPL y refresca árbol (si tu index.js ya lo hace, esto no molesta)
+    if (els.btnStop)     els.btnStop.addEventListener("click", function(){
+      ensureIdle()
+        .then(function(){ return listDir(state.cwd || "/"); })
+        .catch(function(e){ alert(e.message); });
+    });
+
+    // Exponer API mínima si otro módulo quiere usarlo (p.ej. index.js)
+    window.EspressIdeaFS = {
+      listDir: listDir,
+      openFile: openFile,
+      saveActiveFile: saveActiveFile,
+      downloadActiveFile: downloadActiveFile,
+      uploadToCwd: uploadToCwd,
+      apiInfo, apiExists, apiMkdir, apiRename, apiDeleteFile, apiRmdir,
+      ensureIdle: ensureIdle,
+      get state(){ return Object.assign({}, state); }
+    };
+
+    // Opcional: carga inicial del árbol cuando la página abre (puedes depender del Stop si prefieres)
+    // ensureIdle().then(function(){ listDir("/"); });
+
+    // Permitir CTRL+S para guardar
+    window.addEventListener("keydown", function(e){
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault(); saveActiveFile();
+      }
+    });
+  })();
+  </script>
+
 </body>
 </html>

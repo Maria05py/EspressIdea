@@ -120,7 +120,7 @@ void ServerManager::initMdns() {
 
 void ServerManager::initHttp() {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    config.max_uri_handlers = 20;
+    config.max_uri_handlers = 40;
     ESP_ERROR_CHECK(httpd_start(&http_server, &config));
 
     // Index fallback
