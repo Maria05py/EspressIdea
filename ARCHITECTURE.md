@@ -17,13 +17,7 @@ EspressIDEA es un editor web embebido para programar placas que ejecutan **Micro
 
 ## 1. Visión General
 
-```mermaid
-graph LR
-    A[Navegador<br/>(HTML/CSS/JS)] <--WS/HTTP--> B[ESP32<br/>(ESP-IDF + FreeRTOS)]
-    B <--UART REPL--> C[Placa Python<br/>(MicroPython/CircuitPython)]
-    B <--HTTP/WS--> D[SPIFFS<br/>(assets del editor)]
-    B <--HTTP/REST--> E[(Servidor IA opcional)]
-```
+<img width="929" height="301" alt="image" src="https://github.com/user-attachments/assets/62872de3-f761-4a28-b073-840defd4b584" />
 
 - **Navegador**: Cliente web que muestra el editor, el explorador de archivos y la terminal REPL.
 - **ESP32**: Sirve el frontend (SPIFFS), expone APIs HTTP/WS y puentea hacia el REPL por UART.
