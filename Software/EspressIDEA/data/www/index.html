@@ -7,49 +7,130 @@
 
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-  <!-- FontAwesome (opcional) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <!-- Estilos -->
-  <link rel="stylesheet" href="/Estilos/test.css" />
+  <link rel="stylesheet" href="/styles/index.css" />
   <!-- Orquestador -->
-  <script type="module" src="/JavaScript/index.js"></script>
-
-  <style>
-    .ctx-menu{
-      position: fixed; z-index: 10000; min-width: 180px;
-      background: #1e1e1e; border: 1px solid #333; border-radius: 6px;
-      box-shadow: 0 6px 18px rgba(0,0,0,.35); padding: 6px 0; display:none;
-      color:#eee; font-size: 14px;
-    }
-    .ctx-menu .item{ padding: 8px 12px; cursor: pointer; display:flex; align-items:center; gap:8px; }
-    .ctx-menu .item:hover{ background:#2a2a2a; }
-    .ctx-menu .sep{ height:1px; background:#333; margin:6px 0; }
-    .sidebar .toolbar{
-      display:flex; gap:8px; padding:8px; border-bottom:1px solid #2a2a2a; align-items:center;
-    }
-    .sidebar .toolbar .btn{
-      font-size:12px; padding:4px 8px; border-radius:6px; background:#2a2a2a; color:#ddd; border:1px solid #383838; cursor:pointer;
-    }
-    .sidebar .toolbar .btn:hover{ background:#343434; }
-    .file-tree li.selected{ background:#2a2a2a; }
-  </style>
+  <script type="module" src="/js/index.js"></script>
 </head>
 <body>
+  <!-- Overlay de carga global -->
+  <div id="appLoading" class="overlay hidden" aria-hidden="true">
+    <div class="spinner-lg" role="status" aria-label="Cargando"></div>
+    <div class="overlay-text">Preparando dispositivo…</div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <!-- Modales -->
+  <div id="modalBackdrop" class="modal-backdrop hidden" aria-hidden="true"></div>
+
+  <!-- Modal: Nuevo archivo -->
+  <div id="modalNewFile" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalNewFileTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalNewFileTitle"><i class="bi bi-file-earmark-plus"></i> Nuevo archivo</h3>
+        <button class="modal-close" data-modal-close><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="modal-body">
+        <label class="field">
+          <span>Nombre de archivo</span>
+          <input type="text" id="inpNewFileName" placeholder="main.py" />
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="btn ghost" data-modal-close>Cancelar</button>
+        <button class="btn primary" id="btnConfirmNewFile">Crear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Renombrar -->
+  <div id="modalRename" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalRenameTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalRenameTitle"><i class="bi bi-input-cursor-text"></i> Renombrar</h3>
+        <button class="modal-close" data-modal-close><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="modal-body">
+        <label class="field">
+          <span>Nombre actual</span>
+          <input type="text" id="inpOldName" disabled />
+        </label>
+        <label class="field">
+          <span>Nuevo nombre</span>
+          <input type="text" id="inpNewName" placeholder="nuevo_nombre.py" />
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="btn ghost" data-modal-close>Cancelar</button>
+        <button class="btn primary" id="btnConfirmRename">Renombrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Nueva carpeta -->
+  <div id="modalNewFolder" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalNewFolderTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalNewFolderTitle"><i class="bi bi-folder-plus"></i> Nueva carpeta</h3>
+        <button class="modal-close" data-modal-close><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="modal-body">
+        <label class="field">
+          <span>Nombre de carpeta</span>
+          <input type="text" id="inpNewFolderName" placeholder="carpeta" />
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="btn ghost" data-modal-close>Cancelar</button>
+        <button class="btn primary" id="btnConfirmNewFolder">Crear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Confirmación genérica -->
+  <div id="modalConfirm" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalConfirmTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalConfirmTitle"><i class="bi bi-question-circle"></i> Confirmación</h3>
+        <button class="modal-close" data-modal-close><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="modal-body">
+        <p id="modalConfirmMessage">¿Seguro?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn ghost" data-modal-close>Cancelar</button>
+        <button class="btn danger" id="btnConfirmAccept">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="app">
-    <header class="logo">LOGO EspressIdea</header>
+    <header class="logo">
+      <img src="https://raw.githubusercontent.com/Maria05py/EspressIdea/57d8835712e9e47511a8b6029e10ca63f3d1f998/Assets/ESPRESSIDEA_004.svg" alt="">
+    </header>
 
     <div class="main-container">
       <!-- Sidebar Archivos -->
       <aside class="sidebar">
         <div class="device-title">Dispositivo Python</div>
         <div class="toolbar">
-          <button class="btn" id="btnRefresh"><i class="bi bi-arrow-clockwise"></i></button>
-          <button class="btn" id="btnNewFolder"><i class="bi bi-folder-plus"></i></button>
-          <button class="btn" id="btnRename"><i class="bi bi-input-cursor-text"></i></button>
-          <button class="btn" id="btnDelete"><i class="bi bi-trash3"></i></button>
-          <button class="btn" id="btnInfo"><i class="bi bi-info-circle"></i></button>
+          <button class="btn" id="btnRefresh" title="Refrescar"><i class="bi bi-arrow-clockwise"></i></button>
+          <button class="btn" id="btnNewFile"  title="Nuevo archivo"><i class="bi bi-file-earmark-plus"></i></button>
+          <button class="btn" id="btnNewFolder" title="Nueva carpeta"><i class="bi bi-folder-plus"></i></button>
+          <button class="btn" id="btnRename" title="Renombrar"><i class="bi bi-input-cursor-text"></i></button>
+          <button class="btn" id="btnDelete" title="Eliminar"><i class="bi bi-trash3"></i></button>
+          <button class="btn" id="btnInfo" title="Info"><i class="bi bi-info-circle"></i></button>
         </div>
-        <ul class="file-tree" id="fileTree"></ul>
+
+        <!-- Skeleton + lista -->
+        <div id="fileTreeSkeleton" class="skeleton-list">
+          <div class="sk-line"></div>
+          <div class="sk-line"></div>
+          <div class="sk-line"></div>
+        </div>
+        <ul class="file-tree" id="fileTree" aria-label="Árbol de archivos"></ul>
       </aside>
 
       <!-- Área principal -->
@@ -65,14 +146,16 @@
           <button class="btn save" id="btnSave" title="Guardar archivo activo"><i class="bi bi-save"></i></button>
           <button class="btn download" id="btnDownload" title="Descargar archivo activo"><i class="bi bi-download"></i></button>
           <button class="btn upload" id="btnUpload" title="Subir archivo a carpeta actual"><i class="bi bi-upload"></i></button>
-          <button class="tag green">HOST</button>
-          <!-- en tu index.html, en la barra de controles -->
-<button class="tag red" id="tagAI">IA</button>
-
-          <button class="tag green">Dispositivo python</button>
+          <button class="tag red" id="tagAI">IA</button>
         </div>
 
         <div class="editor-window">
+          <!-- Skeleton editor -->
+          <div id="editorSkeleton" class="skeleton-code">
+            <div class="sk-row"></div>
+            <div class="sk-row"></div>
+            <div class="sk-row short"></div>
+          </div>
           <textarea id="codeEditor" spellcheck="false" placeholder="# Selecciona un archivo para editarlo"></textarea>
         </div>
 

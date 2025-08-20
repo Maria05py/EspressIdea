@@ -53,7 +53,7 @@ function splitRespuesta(seccionesMaybe) {
 
   if (typeof seccionesMaybe === 'object') {
     explicacion = seccionesMaybe.explicacion || seccionesMaybe.explicación || '';
-    codigo      = seccionesMaybe.codigo || seccionesMaybe.código || '';
+    codigo = seccionesMaybe.codigo || seccionesMaybe.código || '';
   } else if (typeof seccionesMaybe === 'string') {
     // fallback simple
     explicacion = seccionesMaybe;
@@ -63,21 +63,21 @@ function splitRespuesta(seccionesMaybe) {
 
 export function initAIChat(opts = {}) {
   const container = opts.containerEl || $('#chatMessages');
-  const input     = opts.inputEl     || $('#chatInput');
-  const sendBtn   = opts.sendBtnEl   || $('#sendBtn');
-  const aiBadge   = opts.aiBadgeEl   || $('#tagAI');  // opcional
-  const placa     = (opts.placa  || 'ideaboard').toLowerCase();
-  const modelo    = (opts.modelo || 'gemini').toLowerCase();
-  const onCode    = typeof opts.onCode === 'function'
+  const input = opts.inputEl || $('#chatInput');
+  const sendBtn = opts.sendBtnEl || $('#sendBtn');
+  const aiBadge = opts.aiBadgeEl || $('#tagAI');  // opcional
+  const placa = (opts.placa || 'ideaboard').toLowerCase();
+  const modelo = (opts.modelo || 'gemini').toLowerCase();
+  const onCode = typeof opts.onCode === 'function'
     ? opts.onCode
     : (code) => {
-        const ta = $('#codeEditor');
-        if (!ta) { alert('No encontré #codeEditor para insertar el código'); return; }
-        ta.value = code;
-        // Dispara evento input para que otros módulos detecten cambio
-        ta.dispatchEvent(new Event('input', { bubbles: true }));
-        ta.focus();
-      };
+      const ta = $('#codeEditor');
+      if (!ta) { alert('No encontré #codeEditor para insertar el código'); return; }
+      ta.value = code;
+      // Dispara evento input para que otros módulos detecten cambio
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+      ta.focus();
+    };
 
   if (!container || !input || !sendBtn) {
     console.warn('[ai-chat] faltan elementos base (#chatMessages, #chatInput, #sendBtn)');
@@ -126,6 +126,30 @@ export function initAIChat(opts = {}) {
   // ---- Envío de mensaje ----
   let sending = false;
 
+  // --- NUEVO: helper para pelar triple backticks ---
+  function peelFencedCode(txt) {
+    if (typeof txt !== 'string') return { code: '', lang: '', raw: '', fenced: false };
+    // Match bloque completo con fences (tolera espacios al inicio/fin)
+    // ```python\n ... \n```
+    const m = txt.match(/^\s*```([a-z0-9_+-]*)?\s*\n([\s\S]*?)\n```[\s]*$/i);
+    if (m) {
+      const lang = (m[1] || '').trim();
+      const inner = m[2] ?? '';
+      return { code: inner, lang, raw: txt, fenced: true };
+    }
+    // También soporta una línea con ```lang y cierre al final sin \n previos
+    const m2 = txt.match(/^\s*```([a-z0-9_+-]*)?\s*([\s\S]*?)```[\s]*$/i);
+    if (m2) {
+      const lang = (m2[1] || '').trim();
+      const inner = m2[2] ?? '';
+      // si el inner comienza con \n, quítalo; si termina con \n, quítalo
+      const cleaned = inner.replace(/^\n/, '').replace(/\n$/, '');
+      return { code: cleaned, lang, raw: txt, fenced: true };
+    }
+    return { code: txt, lang: '', raw: txt, fenced: false };
+  }
+
+
   async function sendMessage() {
     if (sending) return;
     const msg = input.value.trim();
@@ -166,22 +190,34 @@ export function initAIChat(opts = {}) {
       }
 
       // Render de código + botones (copiar / insertar)
+      // Render de código + botones (copiar / insertar)
       if (codigo) {
-        const codeWrap = document.createElement('div');
-        codeWrap.className = 'chat-bubble';
-        codeWrap.innerHTML = `
-          <div class="chat-code-tools" style="display:flex; gap:8px; justify-content:flex-end; margin-bottom:6px;">
-            <button class="btn-mini" data-act="copy">Copiar</button>
-            <button class="btn-mini primary" data-act="insert">Insertar en editor</button>
-          </div>
-          <pre class="chat-code"><code>${escapeHTML(codigo)}</code></pre>
-        `;
-        codeWrap.querySelector('[data-act="copy"]').addEventListener('click', async () => {
-          try { await navigator.clipboard.writeText(codigo); } catch {}
-        });
-        codeWrap.querySelector('[data-act="insert"]').addEventListener('click', () => onCode(codigo));
-        container.appendChild(codeWrap);
-      }
+  const parsed = peelFencedCode(codigo);
+
+  const codeWrap = document.createElement('div');
+  codeWrap.className = 'chat-bubble';
+
+  // guarda el texto crudo con fences por si lo quieres recuperar luego
+  codeWrap.dataset.raw = parsed.raw || codigo;
+  // opcional: mantener un caché global de crudos
+  window.AIChatRawCache = window.AIChatRawCache || [];
+  window.AIChatRawCache.push({ lang: parsed.lang, raw: parsed.raw });
+
+  codeWrap.innerHTML = `
+    <div class="chat-code-tools" style="display:flex; gap:8px; justify-content:flex-end; margin-bottom:6px;">
+      <button class="btn-mini" data-act="copy" title="Copiar código sin formato">Copiar</button>
+      <button class="btn-mini primary" data-act="insert" title="Insertar en el editor">Insertar en editor</button>
+    </div>
+    <pre class="chat-code" ${parsed.lang ? `data-lang="${parsed.lang}"` : ''}><code>${escapeHTML(parsed.code)}</code></pre>
+  `;
+
+  codeWrap.querySelector('[data-act="copy"]').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(parsed.code); } catch {}
+  });
+  codeWrap.querySelector('[data-act="insert"]').addEventListener('click', () => onCode(parsed.code));
+
+  container.appendChild(codeWrap);
+}
 
       if (!explicacion && !codigo) {
         // fallback si vino un JSON raro
@@ -217,3 +253,4 @@ export function initAIChat(opts = {}) {
     }
   };
 }
+

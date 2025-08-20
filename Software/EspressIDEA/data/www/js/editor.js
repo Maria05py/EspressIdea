@@ -1,9 +1,16 @@
 // /JavaScript/editor.js
 // Manejador de múltiples archivos abiertos (pestañas) y del textarea.
 // + Ejecución del contenido activo vía /api/exec.
-// Requisitos en fs.js: setExternalEditor(true), on('file:opened'), writeFile().
+// Requisitos en fs.js: setExternalEditor(true), on('file:opened'), writeFile(), apiExists(), apiCreate().
 
-import { FS, on as onFS, setExternalEditor, writeFile as fsWriteFile } from './fs.js';
+import {
+  FS,
+  on as onFS,
+  setExternalEditor,
+  writeFile as fsWriteFile,
+  apiExists,
+  apiCreate
+} from './fs.js';
 
 const $  = (sel, root) => (root || document).querySelector(sel);
 
@@ -28,6 +35,10 @@ const els = {
 
 // ---------------------------- Utils ----------------------------
 function baseName(p){ const s = String(p||''); const i = s.lastIndexOf('/'); return (i>=0)? s.slice(i+1): s; }
+function joinPath(dir, name){
+  if (!dir || dir === "/") return "/" + String(name).replace(/^\/+/, "");
+  return dir.replace(/\/+$/, "") + "/" + String(name).replace(/^\/+/, "");
+}
 
 function ensureFirstTabCloseBtn(enabled, pathForClose){
   const old = $('#activeTab .close-tab');
@@ -152,12 +163,29 @@ function parseJSON(res){
   });
 }
 
+function setWsStatus(mode /* 'idle' | 'running' | 'ok' | 'error' */){
+  if (!els.wsStatus) return;
+  els.wsStatus.classList.remove('success','danger','warn');
+  if (mode === 'running'){ els.wsStatus.classList.add('warn');   els.wsStatus.textContent = 'Ejecutando...'; }
+  else if (mode === 'ok'){ els.wsStatus.classList.add('success'); els.wsStatus.textContent = 'Ejecutado'; }
+  else if (mode === 'idle'){ els.wsStatus.classList.add('success'); els.wsStatus.textContent = 'REPL listo'; }
+  else if (mode === 'error'){ els.wsStatus.classList.add('danger'); els.wsStatus.textContent = 'Error'; }
+}
+
+// ---------------------------- Guardado (create o write) ----------------------------
+async function savePathEnsuringCreate(path, text){
+  const exists = await apiExists(path);
+  if (!exists) await apiCreate(path, text);
+  else         await fsWriteFile(path, text);
+}
+
 // ---------------------------- Acciones de archivo ----------------------------
 async function onSave(){
   const p = state.activePath;
   if (!p) { alert("No hay archivo activo."); return; }
+
   try {
-    await fsWriteFile(p, els.editor.value);
+    await savePathEnsuringCreate(p, els.editor.value);
     const doc = state.docs.get(p);
     if (doc) { doc.text = els.editor.value; doc.dirty = false; }
     renderTabs();
@@ -175,6 +203,7 @@ function onDownload(){
 }
 
 // ---------------------------- Ejecución / REPL ----------------------------
+// Flujo solicitado: GUARDAR → ENSURE_IDLE → EXEC
 async function execActiveEditor(){
   const code = els.editor ? els.editor.value : '';
   if (!code.trim()){
@@ -182,21 +211,42 @@ async function execActiveEditor(){
     return;
   }
 
-  if (els.btnRun) els.btnRun.disabled = true;
-  if (els.wsStatus){
-    els.wsStatus.classList.remove('success','danger');
-    els.wsStatus.classList.add('warn');
-    els.wsStatus.textContent = 'Ejecutando...';
+  // Asegurar que haya un archivo asociado; si no, pedir nombre y crear en cwd
+  let path = state.activePath;
+  if (!path){
+    const cwd = (FS && FS.state && FS.state.cwd) ? FS.state.cwd : '/';
+    const fname = prompt('Nombre del archivo a ejecutar:', 'code.py');
+    if (!fname) return;
+    path = joinPath(cwd, fname);
+    // abre/fija pestaña
+    openOrFocus(path, code);
   }
 
+  if (els.btnRun) els.btnRun.disabled = true;
+  setWsStatus('running');
+
   try{
+    // 1) Guardar (crea si no existe)
+    await savePathEnsuringCreate(path, els.editor.value);
+    // sin marcar dirty
+    const doc = state.docs.get(path);
+    if (doc){ doc.text = els.editor.value; doc.dirty = false; renderTabs(); }
+
+    // 2) Ensure idle
+    await FS.ensureIdle();
+    setWsStatus('idle'); // feedback intermedio
+
+    // 3) Ejecutar
     const resp = await fetch('/api/exec', {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
       body: code
     });
     const j = await parseJSON(resp);
-    if (!j.ok) throw new Error(j.stderr || 'Fallo /api/exec');
+    if (!j.ok) {
+      console.log("fallo silencioso");
+      return;
+    }
 
     if (els.terminal){
       const hdr = document.createElement('div');
@@ -212,18 +262,10 @@ async function execActiveEditor(){
       alert(j.stdout || 'Ejecutado sin salida.');
     }
 
-    if (els.wsStatus){
-      els.wsStatus.classList.remove('warn');
-      els.wsStatus.classList.add('success');
-      els.wsStatus.textContent = 'Ejecutado';
-    }
+    setWsStatus('ok');
   } catch(e){
     console.error(e);
-    if (els.wsStatus){
-      els.wsStatus.classList.remove('warn');
-      els.wsStatus.classList.add('danger');
-      els.wsStatus.textContent = 'Error';
-    }
+    setWsStatus('error');
     alert('Error al ejecutar: ' + e.message);
   } finally {
     if (els.btnRun) els.btnRun.disabled = false;
@@ -235,18 +277,10 @@ async function ensureIdleRepl(){
     const resp = await fetch('/api/repl/ensure_idle', { method:'POST' });
     const j = await parseJSON(resp);
     if (!j.ok) throw new Error('No se pudo asegurar REPL inactivo');
-    if (els.wsStatus){
-      els.wsStatus.classList.remove('danger','warn');
-      els.wsStatus.classList.add('success');
-      els.wsStatus.textContent = 'REPL listo';
-    }
+    setWsStatus('idle');
   } catch(e){
     console.error(e);
-    if (els.wsStatus){
-      els.wsStatus.classList.remove('success','warn');
-      els.wsStatus.classList.add('danger');
-      els.wsStatus.textContent = 'Error REPL';
-    }
+    setWsStatus('error');
     alert('Error preparando REPL: ' + e.message);
   }
 }

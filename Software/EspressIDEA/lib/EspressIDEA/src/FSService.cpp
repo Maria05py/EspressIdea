@@ -472,6 +472,53 @@ esp_err_t FSService::uploadHandler(httpd_req_t* req) {
   return ESP_OK;
 }
 
+// ---------------- create (archivo nuevo) ----------------
+
+esp_err_t FSService::createHandler(httpd_req_t* req) {
+  auto* inst = FSService::self(); if (!inst) return ESP_FAIL;
+
+  std::string path;
+  if (!inst->queryParam(req, "path", path) || path.empty()) {
+    httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "missing path");
+    return ESP_OK;
+  }
+
+  ReplControl::ScopedReplLock lock(inst->repl_, "fs.create");
+
+  int len = req->content_len;
+
+  if (len > 0) {
+    // Si viene cuerpo, se interpreta como BASE64 para contenido inicial (igual que /write)
+    if ((size_t)len > MAX_UPLOAD) {
+      httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "invalid body size");
+      return ESP_OK;
+    }
+    std::string body; body.resize(len);
+    int r = httpd_req_recv(req, body.data(), len);
+    if (r <= 0) {
+      httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "recv error");
+      return ESP_OK;
+    }
+
+    auto rc = inst->board_.writeFile(path, body);
+    if (rc != PyBoard::ErrorCode::OK) {
+      inst->sendJSON(req, std::string("{\"ok\":false,\"error\":\"") + esc(inst->board_.getLastError()) + "\"}");
+      return ESP_OK;
+    }
+  } else {
+    // Sin cuerpo: crear archivo vacío
+    std::vector<uint8_t> empty;
+    auto rc = inst->board_.writeFileRaw(path, empty);
+    if (rc != PyBoard::ErrorCode::OK) {
+      inst->sendJSON(req, std::string("{\"ok\":false,\"error\":\"") + esc(inst->board_.getLastError()) + "\"}");
+      return ESP_OK;
+    }
+  }
+
+  inst->sendJSON(req, std::string("{\"ok\":true,\"path\":\"") + esc(path) + "\"}");
+  return ESP_OK;
+}
+
 // ---------------- Registro de rutas ----------------
 
 void FSService::registerRoutes() {
@@ -522,6 +569,10 @@ void FSService::registerRoutes() {
     .uri="/api/fs/upload", .method=HTTP_POST, .handler=FSService::uploadHandler, .user_ctx=nullptr,
     .is_websocket=false, .handle_ws_control_frames=false, .supported_subprotocol=nullptr
   };
+  httpd_uri_t create = {
+    .uri="/api/fs/create", .method=HTTP_POST, .handler=FSService::createHandler, .user_ctx=nullptr,
+    .is_websocket=false, .handle_ws_control_frames=false, .supported_subprotocol=nullptr
+  };
 
   server_.registerHttpHandler(list);
   server_.registerHttpHandler(read);
@@ -535,4 +586,5 @@ void FSService::registerRoutes() {
   server_.registerHttpHandler(rename);
   server_.registerHttpHandler(download);
   server_.registerHttpHandler(upload);
+  server_.registerHttpHandler(create);
 }

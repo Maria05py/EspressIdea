@@ -1,6 +1,7 @@
 // /JavaScript/fs.js
 // Módulo ES para el explorador/FS del dispositivo Python.
 // Exporta: initFS(), ensureIdle(), FS (API pública)
+
 // --- NUEVO: EventEmitter muy simple basado en EventTarget ---
 const emitter = new EventTarget();
 export function on(eventName, handler){
@@ -29,7 +30,17 @@ export function writeFile(path, text){
     });
 }
 
-
+// --- NUEVO: create (usa /api/fs/create) ---
+export function apiCreate(path, text = ""){
+  const b64 = base64Encode(text || "");
+  return ensureIdle()
+    .then(() => fetchJSON("/api/fs/create?path=" + encodeURIComponent(path), {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: b64
+    }))
+    .then(j => { if (!j.ok) throw new Error(j.error || "create failed"); });
+}
 
 const $  = (sel, root) => (root || document).querySelector(sel);
 const $$ = (sel, root) => Array.prototype.slice.call((root || document).querySelectorAll(sel));
@@ -76,6 +87,7 @@ const els = {
   btnDownload: null,
   btnUpload:   null,
   btnRefresh:  null,
+  btnNewFile:  null,   // ← NUEVO
   btnNewFolder:null,
   btnRename:   null,
   btnDelete:   null,
@@ -118,17 +130,15 @@ function markSelectedFileOpen(path){
 function renderTree(files){
   els.tree.innerHTML = "";
 
-  // Ignorar archivos con nombre sospechoso (los de basura tipo "      print(name+'")
+  // Ignorar archivos con nombre sospechoso (ruido por eco del REPL)
   files = files.filter(f => {
     if (!f || !f.name) return false;
-    // descartar los que empiecen con espacios + "print(" o cosas así
     const trimmed = f.name.trim();
     if (trimmed.startsWith("print(") || trimmed.startsWith("print") || trimmed.includes("print(")) {
       return false;
     }
     return true;
   });
-
 
   if (state.cwd !== "/") {
     const liUp = document.createElement("li");
@@ -216,7 +226,7 @@ export function openFile(path){
     .catch(e => alert(e.message));
 }
 
-
+// --- Guardar (versión con UI actual) ---
 export function saveActiveFile(){
   if (!state.openFile) { alert("No hay archivo activo."); return Promise.resolve(); }
   const b64 = base64Encode(els.editor.value);
@@ -230,6 +240,23 @@ export function saveActiveFile(){
     })
     .then(() => alert("Archivo guardado ✅"))
     .catch(err => alert(err.message));
+}
+
+// --- NUEVO: guardar silencioso (sin alert / ideal para pipelines) ---
+function saveFileSilent(path, text){
+  const b64 = base64Encode(text || "");
+  return ensureIdle()
+    .then(() => fetchJSON("/api/fs/write?path=" + encodeURIComponent(path), {
+      method: "POST", headers: { "Content-Type": "text/plain" }, body: b64
+    }))
+    .then(res => {
+      if (!res.ok) throw new Error(res.error || "save failed");
+      return listDir(state.cwd).catch(()=>{});
+    });
+}
+export function saveActiveFileSilent(){
+  if (!state.openFile) return Promise.resolve();
+  return saveFileSilent(state.openFile, els.editor ? els.editor.value : "");
 }
 
 export function downloadActiveFile(){
@@ -323,6 +350,33 @@ export function apiRmdir(path, recursive){
     .then(j => { if (!j.ok) throw new Error(j.error || "rmdir failed"); });
 }
 
+// ===== EJECUCIÓN =====
+
+// Ejecuta un bloque de código en /api/exec
+export function execCode(code){
+  return fetchJSON("/api/exec", {
+    method: "POST",
+    headers: { "Content-Type": "text/plain" },
+    body: String(code || "")
+  }).then(j => {
+    if (!j || j.ok === false) {
+      const msg = (j && (j.stderr || j.error)) ? (j.stderr || j.error) : "Fallo /api/exec";
+      throw new Error(msg);
+    }
+    return j; // {ok, stdout, stderr}
+  });
+}
+
+// Pipeline pedido: guardar → ensure_idle → ejecutar contenido actual del editor
+export function runActiveSafe(){
+  const path = state.openFile;
+  if (!path) return Promise.reject(new Error("No hay archivo activo."));
+  const code = els.editor ? els.editor.value : "";
+  return saveFileSilent(path, code)
+    .then(() => ensureIdle())
+    .then(() => execCode(code));
+}
+
 // ===== Menú contextual =====
 const ctx = (() => {
   const div = document.createElement("div");
@@ -359,14 +413,8 @@ function openContextMenu(x, y, target){
     items.push({ icon:"bi bi-file-earmark-plus", label:"Nuevo archivo aquí", onClick:() => {
       const fname = prompt("Nombre de archivo:"); if (!fname) return;
       const full = joinPath(target.path, fname);
-      ensureIdle()
-        .then(() => {
-          const b64 = base64Encode("");
-          return fetchJSON("/api/fs/write?path=" + encodeURIComponent(full), {
-            method: "POST", headers: { "Content-Type":"text/plain" }, body:b64
-          });
-        })
-        .then(j => { if (!j.ok) throw new Error(j.error||"write failed"); return listDir(state.cwd); })
+      apiCreate(full, "")
+        .then(() => listDir(state.cwd))
         .catch(e => alert(e.message));
     }});
     items.push({ icon:"bi bi-folder-plus", label:"Nueva carpeta aquí", onClick:() => {
@@ -417,6 +465,13 @@ function openContextMenu(x, y, target){
 // ===== Wire de botones (FS) =====
 function wireButtons(){
   if (els.btnRefresh)   els.btnRefresh.addEventListener("click", () => ensureIdle().then(() => listDir(state.cwd)));
+  if (els.btnNewFile)   els.btnNewFile.addEventListener("click", () => {
+    const fname = prompt("Nombre de archivo (en " + state.cwd + "):"); if (!fname) return;
+    const full = joinPath(state.cwd, fname);
+    apiCreate(full, "")
+      .then(() => listDir(state.cwd))
+      .catch(e => alert(e.message));
+  });
   if (els.btnNewFolder) els.btnNewFolder.addEventListener("click", () => {
     const d = prompt("Nombre de carpeta (en " + state.cwd + "):"); if (!d) return;
     apiMkdir(joinPath(state.cwd, d)).then(() => listDir(state.cwd)).catch(e => alert(e.message));
@@ -464,6 +519,16 @@ function wireButtons(){
   });
 }
 
+// (Opcional) Nuevo archivo en cwd vía botón futuro
+export function newFileInCwd(){
+  const fname = prompt("Nombre de archivo (en " + state.cwd + "):");
+  if (!fname) return;
+  const full = joinPath(state.cwd, fname);
+  apiCreate(full, "")
+    .then(() => listDir(state.cwd))
+    .catch(e => alert(e.message));
+}
+
 // ===== Inicialización pública =====
 export function initFS(){
   els.tree        = $("#fileTree");
@@ -474,6 +539,7 @@ export function initFS(){
   els.btnDownload = $("#btnDownload");
   els.btnUpload   = $("#btnUpload");
   els.btnRefresh  = $("#btnRefresh");
+  els.btnNewFile  = $("#btnNewFile");     // ← NUEVO
   els.btnNewFolder= $("#btnNewFolder");
   els.btnRename   = $("#btnRename");
   els.btnDelete   = $("#btnDelete");
@@ -484,14 +550,16 @@ export function initFS(){
     return;
   }
   wireButtons();
-  // Si quieres, puedes arrancar con el árbol vacío y esperar al STOP
+  // Arranque diferido: esperar a STOP si deseas
   // ensureIdle().then(() => listDir("/"));
 }
 
 // ===== API pública (para otros módulos) =====
 export const FS = {
   listDir, openFile, saveActiveFile, downloadActiveFile, uploadToCwd,
-  apiInfo, apiExists, apiMkdir, apiRename, apiDeleteFile, apiRmdir,
-  ensureIdle, writeFile, // ← nuevo
+  apiInfo, apiMkdir, apiRename, apiDeleteFile, apiRmdir,
+  ensureIdle, writeFile,
+  execCode, runActiveSafe,               // ← NUEVO: ejecución
+  saveActiveFileSilent,                  // ← por si lo necesitas desde fuera
   get state(){ return Object.assign({}, state); }
 };
