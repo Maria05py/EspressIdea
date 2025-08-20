@@ -2,15 +2,13 @@
 
 Gracias por tu interés en mejorar **EspressIDEA**. Este es un proyecto abierto y educativo, y todas las contribuciones son bienvenidas: código, documentación, ejemplos, pruebas y retroalimentación, así como ideas y mejoras a lo aquí propuesto.
 
----
-
 ## Cómo contribuir
 
 1. Haz un **fork** del repositorio.  
 2. Crea una rama descriptiva para la contribución:  
    ```bash
    git checkout -b feature/nueva-funcion
-
+   ```
 
 ## Realiza tus cambios siguiendo los estándares de código.
 - Documenta cambios.
@@ -47,6 +45,6 @@ Al abrir un issue, por favor incluye:
 - Aporta pensando en estudiantes y principiantes.
 - Fomenta la accesibilidad y la educación tecnológica.
 
-#Licencia
+# Licencia
 Este proyecto está bajo la licencia CC0 1.0 Universal (dominio público).
 Al contribuir, aceptas que tu aporte se comparte bajo la misma licencia.
