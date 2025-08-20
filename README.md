@@ -108,15 +108,20 @@ Lista breve de lo que el sistema debe lograr:
 
 **Riesgos identificados y mitigaciones:**
 
-- **Riesgo 1:** Problemas de compatibilidad entre ESP32 y placas destino.  
-  **Mitigación:** Usar firmwares estables (MicroPython/CircuitPython) y realizar pruebas específicas por placa.
+- **Riesgo 1:** Problemas de compatibilidad entre ESP32 y placas destino.
+  **Mitigación:** Usar firmwares estables (MicroPython/CircuitPython), realizar pruebas específicas por placa y mantener documentación de versiones soportadas.
 
-- **Riesgo 2:** Latencia o fallos de respuesta del modelo de lenguaje.  
-  **Mitigación:** Configurar fallback entre Gemini y Ollama, registrar logs detallados para debugging mediante historiales en formato json.
+- **Riesgo 2:** Latencia o fallos de respuesta del modelo de lenguaje.
+  **Mitigación:** Configurar fallback entre Gemini y Ollama, registrar logs detallados en JSON, habilitar caché de respuestas comunes.
 
-**Competencia directa:** 
-- WebREPL: Requiere placas compatibles y es básico para principiantes.
-- Copilot/VSCode: Potencia, pero poco soporte para Circuit/MicroPython.
+- **Riesgo 3:** Complejidad para usuarios principiantes.
+  **Mitigación:** Crear guías paso a paso, ejemplos preinstalados y tutoriales visuales dentro del front.
 
+**Competencia directa**
+
+- **WebREPL (MicroPython oficial):** Funciona en navegadores, pero requiere placas compatibles y ofrece una interfaz limitada para principiantes.
+- **Copilot/VSCode:** Altamente potente para proyectos en Python, pero sin soporte real para MicroPython/CircuitPython ni interacción directa con placas.
+- **Thonny IDE:** Muy usado en educación, sencillo, pero depende de conexión USB y carece de integración con IA o acceso remoto.
+  
 
 
