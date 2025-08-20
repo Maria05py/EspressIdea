@@ -25,7 +25,7 @@ Este readme contiene la documentación extendida del **hardware** utilizado en e
 
 ---
 
-## 🛠 Componentes mecánicos
+##  Componentes mecánicos
 
 | Componente | Descripción |
 |------------|-------------|
@@ -46,4 +46,5 @@ Este readme contiene la documentación extendida del **hardware** utilizado en e
 
 
 ---
+
 
