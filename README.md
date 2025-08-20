@@ -17,15 +17,12 @@
   </a>
 </p>
 
-# EspressIDEA - Avance Preliminar del Proyecto
-
 ## 1. Información del Proyecto
 **Equipo:**
-- Emanuel Mena Araya (Backend)
-- Angel Cabrera Mata (Frontend)
-- Thais Hernández Quesada (LLM e investigación)
-- María Jesús Rodríguez Molina (LLM e investigación)
-
+- Emanuel Mena Araya (Backend/Operador)
+- Angel Cabrera Mata (UX/Apoyo Visual)
+- Thais Hernández Quesada (Vocera)
+- María Jesús Rodríguez Molina (IA/Narrativa)
 
 ---
 
@@ -34,6 +31,10 @@
 **Problema que se aborda:**  
 El aprendizaje de programación embebida con microcontroladores resulta complejo para principiantes debido a la necesidad de configurar múltiples herramientas, instalar software específico y conocer lenguajes como Python y Micropython.
 
+- Aprender microcontroladores abruma: Demasiada información y pasos técnicos.
+- Falta de herramientas: Herramientas remotas actuales son limitadas o rígidas para novatos.
+- IA ineficiente: Asistentes de código comunes no cubren bien Circuit/MicroPython.
+
 **Importancia y contexto:**  
 Existe una creciente demanda de herramientas educativas accesibles que permitan enseñar programación y robótica desde edades tempranas. EspressIDEA facilita este proceso al centralizar el desarrollo sobre Python y ofrecer asistencia en tiempo real mediante modelos de lenguaje. EspressIDEA es una plataforma de desarrollo remoto y asistido para microcontroladores que ejecutan Python (MicroPython y CircuitPython). Aprovecha un microcontrolador ESP32 que actúa como un intermediario inteligente, permitiendo:
 - Interfaz serial con dispositivos Python (por UART) como si fueran conectados por USB a un PC.
@@ -41,7 +42,7 @@ Existe una creciente demanda de herramientas educativas accesibles que permitan 
 - Integración con modelos de lenguaje (LLM) para generar, explicar y documentar código en tiempo real.
 - Compatibilidad con placas sin WiFi nativo, como Raspberry Pi Pico, Metro, Feather M4, entre otras.
 
-**Usuarios/beneficiarios:**  
+**Usuarios/beneficiarios del proyecto:**  
 - Estudiantes de secundaria y universidad.  
 - Docentes de tecnología, computación o robótica.  
 - Aficionados a la electrónica y makers.  
@@ -68,13 +69,13 @@ Lista breve de lo que el sistema debe lograr:
 
 - Requisito 1: Permitir la conexión UART entre el ESP32 y microcontroladores sin WiFi.  
 - Requisito 2: Exponer un editor de código accesible vía navegador web local.  
-- Requisito 3: Integrar un servidor Flask con capacidad de generar y explicar código usando Gemini u Ollama.
+- Requisito 3: Integrar un servidor Flask con capacidad de generar y explicar código usando Gemini u Ollama (Según contexto o preferencias).
 
 ---
 
 ## 5. Diseño Preliminar del Sistema
 
-**Arquitectura inicial (diagrama en proceso):**
+**Arquitectura inicial:**
 
 
 
@@ -98,10 +99,10 @@ Lista breve de lo que el sistema debe lograr:
 | Instalación y configuración LLM  |  Semana del 1 al 5 de Julio       |
 | Desarrollo del editor web        |  Semana del 5 al 12 de Julio      | 
 | Comunicación UART funcional      |  Semana del 12 al 19 de Julio     |   
-| Generación de código en vivo     |                 |
-| Pruebas con placas reales        |                 |
-| Documentación inicial            |                 |
-| Revisión final y ajustes         |                 |
+| Generación de código en vivo     |  Semana del 19 al 26 de Julio     |
+| Pruebas con placas reales        |  Semana del 26 al 9 de Agosto     |
+| Documentación inicial            |  Semana del 9 al 19 de Agosto     |
+| Revisión final y ajustes         |  Semana del 17 al 19 de Agosto    |
 
 **Riesgos identificados y mitigaciones:**
 
@@ -109,7 +110,7 @@ Lista breve de lo que el sistema debe lograr:
   **Mitigación:** Usar firmwares estables (MicroPython/CircuitPython) y realizar pruebas específicas por placa.
 
 - **Riesgo 2:** Latencia o fallos de respuesta del modelo de lenguaje.  
-  **Mitigación:** Configurar fallback entre Gemini y Ollama, registrar logs detallados para debugging.
+  **Mitigación:** Configurar fallback entre Gemini y Ollama, registrar logs detallados para debugging mediante historiales en formato json.
 
 ---
 
@@ -120,7 +121,9 @@ Lista breve de lo que el sistema debe lograr:
 
 
 
-
+**Competencia directa:** 
+- WebREPL: Requiere placas compatibles y es básico para principiantes.
+- Copilot/VSCode: Potencia, pero poco soporte para Circuit/MicroPython.
 
 
 
