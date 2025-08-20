@@ -1,78 +1,92 @@
-
 # EspressIDEA
 
-EspressIDEA es un editor web ligero para programar placas microcontroladoras que ejecutan MicroPython o CircuitPython. El proyecto utiliza un ESP32 como intermediario entre el navegador y el dispositivo Python, lo que permite editar, ejecutar y gestionar archivos directamente desde una interfaz web — sin necesidad de instalar nada en el dispositivo host.
+EspressIDEA es un editor web ligero diseñado para programar placas que
+ejecutan **MicroPython** o **CircuitPython**.\
+El proyecto utiliza un **ESP32** como intermediario entre el navegador y
+el dispositivo Python, permitiendo:
 
----
+-   Acceso directo al REPL.
+-   Exploración, creación, modificación y eliminación de archivos.
+-   Ejecución y detención de código Python.
+-   Interacción en vivo con el terminal, directamente desde una interfaz
+    web.
+-   Integración opcional con un servidor de IA para generación de
+    código.
 
-## 🚀 Características
+------------------------------------------------------------------------
 
-- Comunicación bidireccional en tiempo real entre navegador y placa vía WebSocket
-- Editor web para escribir y ejecutar código Python
-- Sistema de archivos remoto (leer, escribir, subir, descargar)
-- Soporte para múltiples rutas WebSocket (modular)
-- Modularización del backend en C++ para mejor mantenimiento
-- Preparado para integrarse con un LLM (modelo de lenguaje) para generación de código inteligente *(próximamente)*
+## Características principales
 
----
+-   Comunicación bidireccional en tiempo real (navegador ↔ ESP32 ↔ placa
+    Python).
+-   Editor web embebido servido desde el ESP32 (SPIFFS).
+-   Sistema de archivos remoto: lectura, escritura, subida, descarga y
+    borrado.
+-   WebSocket de terminal para acceder al REPL como si fuera un puerto
+    serie.
+-   Ejecución de código con control sobre interrupciones y reinicios.
+-   Modularización del backend en C++ para mantenimiento y
+    extensibilidad.
+-   Conector opcional hacia un servidor LLM externo (IA).
 
-## 🛠️ Tecnologías Usadas
+------------------------------------------------------------------------
 
-- **ESP-IDF + PlatformIO**: para desarrollar el firmware del ESP32
-- **C++ (ESP32)**: backend modular para manejar WebSockets, UART y FS
-- **JavaScript + HTML/CSS**: frontend del editor
-- **WebSockets**: comunicación en tiempo real con el navegador
-- **ArduinoJson**: parser JSON para el backend
-- **SPIFFS**: sistema de archivos embebido para alojar la página web
+## Tecnologías utilizadas
 
----
+-   **ESP-IDF + PlatformIO** --- Desarrollo del firmware para ESP32.
+-   **C/C++** --- Backend modular: control de UART, REPL, WebSockets, HTTP
+    y FS.
+-   **HTML, CSS, JavaScript** --- Frontend del editor web.
+-   **SPIFFS** --- Sistema de archivos embebido para servir la interfaz.
+-   **FreeRTOS** --- Tareas concurrentes en el ESP32.
 
-## 🧩 Estructura del Proyecto
+------------------------------------------------------------------------
 
-```
-EspressIDEA/
-├── .pio/                   ← Carpeta interna de PlatformIO (builds temporales)
-├── .vscode/                ← Configuración del entorno para VSCode
-├── build/                  ← Archivos de compilación generados por ESP-IDF
-├── data/                   ← Archivos estáticos para el sitio web (html, css, js, imágenes)
-├── include/                ← Headers compartidos si se requieren de forma global
-├── lib/                    ← Librerías del proyecto (EspressIDEA, ServerManager, Pyboard, etc.)
-│   ├── EspressIDEA/        ← Lógica del IDE, comunicación con el dispositivo Python
-│   ├── ServerManager/      ← Manejo del servidor HTTP/WebSocket + SPIFFS
-│   └── Pyboard_cpp/        ← Manejo de REPL/CircuitPython vía UART (Pyboard en C++)
-├── managed_components/     ← Componentes auto-gestionados por PlatformIO/ESP-IDF
-├── src/                    ← Código principal del firmware (main.cpp)
-├── test/                   ← Pruebas (si se usan)
-├── platformio.ini          ← Configuración de PlatformIO (plataforma, entornos, flags)
-├── sdkconfig*              ← Configuraciones generadas por menuconfig para distintas placas
-├── partitions.csv          ← Particionamiento de memoria del ESP32
-└── README.md               ← Este archivo
-```
+## Estructura del proyecto
 
----
+    EspressIDEA/
+    ├── .pio/                   ← Carpeta interna de PlatformIO (builds temporales)
+    ├── .vscode/                ← Configuración de VSCode
+    ├── build/                  ← Archivos de compilación de ESP-IDF
+    ├── data/                   ← Archivos estáticos del sitio web (html, css, js)
+    ├── include/                ← Headers compartidos globalmente
+    ├── lib/                    ← Librerías principales del backend
+    │   ├── EspressIDEA/        ← Núcleo del IDE (ReplControl, servicios, etc.)
+    │   ├── ServerManager/      ← Manejo de WiFi, mDNS, HTTP y WebSockets
+    │   ├── PyBoardUART/        ← Implementación del REPL en C++ vía UART
+    ├── managed_components/     ← Dependencias gestionadas por ESP-IDF/PIO
+    ├── src/                    ← Código principal (ej. `main.cpp`)
+    ├── test/                   ← Pruebas unitarias o de integración
+    ├── platformio.ini          ← Configuración de entornos PlatformIO
+    ├── sdkconfig*              ← Configuraciones generadas por menuconfig
+    ├── partitions.csv          ← Particiones de memoria para el ESP32
+    └── README.md               ← Este archivo
 
-## 🧑‍💻 Cómo compilar y cargar el firmware
+------------------------------------------------------------------------
 
-### 1. 🧰 Requisitos
+## Compilación y carga del firmware
 
-- [VSCode](https://code.visualstudio.com/)
-- [PlatformIO](https://platformio.org/)
-- ESP32 D1 Mini o compatible (soportado en el proyecto)
+### 1. Requisitos previos
 
-### 2. 🧪 Clona el repositorio
+-   [VSCode](https://code.visualstudio.com/)
+-   [PlatformIO](https://platformio.org/)
+-   Una placa ESP32 (ej. Wemos D1 Mini ESP32, ESP32-DevKitC)
 
-**NO CLONES EL REPOSITORIO EN UNA DIRECCIÓN QUE TENGA ESPACIOS EN BLANCO, ESP-IDF NO PERMITE HACER BUILDS SI ESTE ES EL CASO**
+### 2. Clonar el repositorio
 
-```bash
+> Importante: **no clones en una ruta con espacios**; ESP-IDF no soporta
+> builds en esas condiciones.
+
+``` bash
 git clone https://github.com/Maria05py/EspressIdea.git
 cd EspressIDEA
 ```
 
-### 3. ⚙️ Elige tu placa en `platformio.ini`
+### 3. Configurar la placa en `platformio.ini`
 
-El proyecto soporta múltiples placas. Ejemplo:
+Ejemplo para Wemos D1 Mini:
 
-```ini
+``` ini
 [env:wemos_d1_mini32]
 platform = espressif32
 board = wemos_d1_mini32
@@ -80,50 +94,79 @@ framework = espidf
 monitor_speed = 115200
 ```
 
-> Puedes cambiar a otra, como `esp32dev`, si tu placa es diferente.
+### 4. Compilar y flashear el firmware
 
-### 4. 📂 Sube los archivos web (html/js/css)
+``` bash
+pio run --target upload
+```
 
-```bash
+### 5. Cambiar los PlaceHolders en CREDENTIALS.txt
+
+Dentro de la carpeta `data` se encuentra un archivo CREDENTIALS.txt, que se debe ver así
+
+```
+SSID=WIFI_SSID
+PASS=WIFI_PASS
+HOST=MDNS_HOSTNAME
+LLM_URL=AI_SERVER
+```
+
+aquí cambias SSID por el nombre de la red de WiFi, PASS, por la contraseña, HOST por el hostname por el que se va a acceder al servidor, y LLM_URL por la URL del servidor que probee el LLM, para mas información de este puedes ver [aqui](https://github.com/Maria05py/EspressIdea/tree/main/Models/Servidor_LLM).
+
+*IMPORTANTE* 
+`LA RED WIFI NO PUEDE SER MAYOR A 2.4Ghz`
+
+### 6. Subir los archivos web (HTML/JS/CSS)
+
+``` bash
 pio run --target buildfs
 pio run --target uploadfs
 ```
 
-### 5. 🔥 Compila y flashea el firmware
+### 7.Acceder al servidor
+Una vez subido el Firmware y los Spiffs, solo tienes que estar conectado a la misma red WiFi que el ESP32, y luego acceder desde el navegador!
+simplemente accede al al nombre que pusiste como HOST en CREDENTIALS.txt y le añades un `.local`
 
-```bash
-pio run --target upload
+*Por ejemplo:*
+
+Si Pusiste
+
+```
+HOST=espressidea
 ```
 
-### 6. 🖥️ Abre el monitor serie
+tendrás que buscar espressidea.local en tu navegador.
 
-```bash
-pio device monitor
-```
+Si hiciste esto correctamente verás la interfaz web de EspressIDEA.
 
----
+------------------------------------------------------------------------
 
-## 🌐 Cómo usar la interfaz web
+## Uso de la interfaz web
 
-1. Conecta tu ESP32 al WiFi y accede a la IP que muestra por el puerto serie.
-2. La interfaz web se servirá automáticamente desde SPIFFS.
-3. Escribe código, súbelo, ejecútalo y observa la salida en vivo.
+-   Editar código.
+-   Guardar y descargar archivos.
+-   Ejecutar scripts en la placa.
+-   Usar la terminal en vivo.
+-   Generar, Arreglar, Documentar y Explicar Código por medio de un asistente IA
 
----
+------------------------------------------------------------------------
 
-## 🧭 Estado actual del proyecto
+## Estado actual del proyecto
 
-✅ Comunicación WebSocket  
-✅ Editor web básico  
-✅ Explorador de archivos remoto  
-✅ Comunicación con REPL vía UART  
-🔜 Integración con LLM (en desarrollo)  
-🔜 Editor visual más completo  
-🔜 Terminal interactiva estilo VSCode
+-   [x] Comunicación WebSocket estable.
+-   [x] Editor web básico embebido.
+-   [x] Explorador de archivos remoto (listado, lectura, escritura,
+    borrado).
+-   [x] Ejecución de código con control de REPL.
+-   [X] Integración con servidor LLM (en progreso).
+-   [X] Mejoras de la UI (editor más avanzado, terminal tipo VSCode).
 
+------------------------------------------------------------------------
 
----
+## Licencia
 
-## 📜 Licencia
+Este proyecto se distribuye bajo la licencia **CC0 1.0 Universal**.
 
-Este proyecto se distribuye bajo la licencia CC0 1.0 Universal.
+_Desarrollado por Emanuel Mena Araya, 2025, para las Olimpiadas Informaticas de EXPOCENFO_
+_© EpressIDEA 2025_
+_No olvides Apoyar a proyectos Open Source!_
