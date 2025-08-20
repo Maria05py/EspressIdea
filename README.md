@@ -109,13 +109,17 @@ Lista breve de lo que el sistema debe lograr:
 **Riesgos identificados y mitigaciones:**
 
 - **Riesgo 1:** Problemas de compatibilidad entre ESP32 y placas destino.
+  
   **Mitigación:** Usar firmwares estables (MicroPython/CircuitPython), realizar pruebas específicas por placa y mantener documentación de versiones soportadas.
 
 - **Riesgo 2:** Latencia o fallos de respuesta del modelo de lenguaje.
+  
   **Mitigación:** Configurar fallback entre Gemini y Ollama, registrar logs detallados en JSON, habilitar caché de respuestas comunes.
 
 - **Riesgo 3:** Complejidad para usuarios principiantes.
+  
   **Mitigación:** Crear guías paso a paso, ejemplos preinstalados y tutoriales visuales dentro del front.
+  
 
 **Competencia directa**
 
