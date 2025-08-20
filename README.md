@@ -112,15 +112,6 @@ Lista breve de lo que el sistema debe lograr:
 - **Riesgo 2:** Latencia o fallos de respuesta del modelo de lenguaje.  
   **Mitigación:** Configurar fallback entre Gemini y Ollama, registrar logs detallados para debugging mediante historiales en formato json.
 
----
-
-## 7. Prototipos conceptuales (si aplica)
-
-
-
-
-
-
 **Competencia directa:** 
 - WebREPL: Requiere placas compatibles y es básico para principiantes.
 - Copilot/VSCode: Potencia, pero poco soporte para Circuit/MicroPython.
