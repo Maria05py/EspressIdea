@@ -1,6 +1,6 @@
 #  Hardware 
 
-Este readme contiene la documentación extendida del **hardware** utilizado en el proyecto, el cual combina una **placa ESP32** con diferentes módulos electrónicos y mecánicos para crear un sistema embebido completo y funcional.
+Este readme contiene la documentación extendida del **hardware** utilizado en el proyecto, el cual combina una **placa ESP32** con diferentes módulos electrónicos y mecánicos para crear un sistema embebido completo y funcional. El siguiente documento introduce a A.M.I.G.O. (Architectura de Management e Interfaz de Gestión On-Line), un pequeño robot concebido como aliado de EspressIDEA. Su propósito es materializar, durante las presentaciones, la conexión entre el entorno digital y la robótica educativa, permitiendo ejecutar y validar en tiempo real los programas generados en la plataforma. Más que un simple complemento, A.M.I.G.O. representa la integración práctica de hardware, software e inteligencia artificial, ofreciendo un recurso accesible y didáctico para mostrar de forma clara cómo la teoría se transforma en experiencia tangible.
 
 ---
 
@@ -46,4 +46,6 @@ Este readme contiene la documentación extendida del **hardware** utilizado en e
 | Porta baterías 4xAA con tapa y switch | Alternativa para alimentación mediante pilas AA. | [Ver componente](https://www.crcibernetica.com/battery-holder-4xaa-with-cover-and-switch/?searchid=2437884&s) |
 
 ---
+<img width="771" height="663" alt="image" src="https://github.com/user-attachments/assets/fe00d026-9c03-4894-8b8d-4a7fd6c1073a" />
+
 
