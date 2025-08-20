@@ -76,6 +76,7 @@ Lista breve de lo que el sistema debe lograr:
 ## 5. Diseño Preliminar del Sistema
 
 **Arquitectura inicial:**
+
 <img width="929" height="301" alt="image" src="https://github.com/user-attachments/assets/7d239c0e-2cd0-4bf3-a96f-af14ae45d002" />
 
 
